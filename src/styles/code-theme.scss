@@ -1,0 +1,131 @@
+@use './variables' as *;
+
+// Custom Code Highlighting Theme - Light theme only
+// Based on GitHub Light theme
+
+.hljs {
+  background: $bg-secondary !important;
+  color: $text-primary !important;
+}
+
+// Keywords: class, function, public, private, return, etc.
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+  color: #d73a49 !important;
+}
+
+.hljs-function .hljs-keyword {
+  color: #6f42c1 !important;
+}
+
+.hljs-subst {
+  color: #24292e !important;
+}
+
+// Strings
+.hljs-string,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #032f62 !important;
+}
+
+// Class names, function names, types
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_,
+.hljs-name,
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-function .hljs-title {
+  color: #6f42c1 !important;
+}
+
+// Variables and attributes
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-variable.language_,
+.hljs-variable.constant_ {
+  color: #e36209 !important;
+}
+
+// Comments
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion,
+.hljs-meta {
+  color: #6a737d !important;
+}
+
+// Numbers
+.hljs-number {
+  color: #005cc5 !important;
+}
+
+// Built-in functions and constants
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #005cc5 !important;
+}
+
+// PHP specific
+.hljs-meta.prompt_,
+.language-php .hljs-meta {
+  color: #6a737d !important;
+}
+
+// Bold text for important elements
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-type,
+.hljs-name,
+.hljs-strong {
+  font-weight: 600;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+// Line numbers for code blocks
+.hljs-ln-numbers {
+  text-align: right;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border);
+  padding-right: $spacing-sm;
+  margin-right: $spacing-sm;
+  user-select: none;
+}
+
+// Highlighted lines
+.hljs-ln-line.highlighted {
+  background-color: rgba($brand-primary, 0.1);
+  border-left: 3px solid $brand-primary;
+}
+
+// Code language badge
+.code-language-badge {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: $brand-primary;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: $radius-sm;
+  font-family: $font-family-mono;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}

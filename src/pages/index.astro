@@ -1,0 +1,157 @@
+---
+/**
+ * Home page — Lists all available decks grouped by name.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import config from 'virtual:deck/config';
+import path from 'node:path';
+import { loadDeckMeta, hasContent } from '../content/infrastructure/content-loader';
+import { groupSlidesByDeck } from '../content/domain/slide.service';
+import { formatDayName } from '../content/domain/slide.model';
+import type { DeckMeta, DeckDay, DeckGroup } from '../content/domain/slide.model';
+import '../styles/home.scss';
+
+const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+
+// Discover all slides from the configured collection
+const allSlides = await getCollection(config.collection as any);
+
+// Group slides by deck path
+const deckGroups = groupSlidesByDeck(allSlides);
+
+// Build deck metadata map
+const decksMap = new Map<string, DeckMeta>();
+
+for (const deckPath of deckGroups.keys()) {
+  if (!decksMap.has(deckPath)) {
+    decksMap.set(deckPath, loadDeckMeta(contentDir, deckPath));
+  }
+}
+
+// Convert to array with path info
+const decks = Array.from(decksMap.entries()).map(([deckPath, meta]) => {
+  const parts = deckPath.split('/');
+  const groupName = parts[0] || deckPath;
+  const dayName = parts[1] || '';
+
+  return {
+    path: deckPath,
+    groupName,
+    dayName,
+    hasExercises: hasContent(contentDir, deckPath, 'exercices'),
+    hasCorrections: hasContent(contentDir, deckPath, 'corrections'),
+    ...meta,
+  };
+});
+
+// Group by deck name (first level: ddd, git, phpunit, etc.)
+const groupsMap = new Map<string, DeckDay[]>();
+
+for (const deck of decks) {
+  const group = groupsMap.get(deck.groupName) || [];
+  group.push({
+    path: deck.path,
+    dayName: deck.dayName,
+    id: deck.id,
+    title: deck.title,
+    tags: deck.tags,
+    hasExercises: deck.hasExercises,
+    hasCorrections: deck.hasCorrections,
+  });
+  groupsMap.set(deck.groupName, group);
+}
+
+// Sort days within each group
+const groups: DeckGroup[] = Array.from(groupsMap.entries())
+  .map(([name, days]) => ({
+    name,
+    days: [...days].sort((a, b) => a.dayName.localeCompare(b.dayName)),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<BaseLayout title="Presentations" description="Interactive technical presentations">
+  <main class="home">
+    <header class="header">
+      <h1>Presentations</h1>
+      <p class="subtitle">Interactive technical presentations</p>
+    </header>
+
+    {
+      groups.length === 0 ? (
+        <div class="empty-state">
+          <p>No decks available yet.</p>
+          <p class="hint">
+            Add markdown files in
+            <code>src/content/{config.contentBase}/</code>
+          </p>
+        </div>
+      ) : (
+        groups.map((group) => (
+          <section class="formation-group">
+            <div class="group-header">
+              <h2>{group.name.toUpperCase()}</h2>
+              <span class="group-count">
+                {group.days.length} {group.days.length > 1 ? 'sessions' : 'session'}
+              </span>
+            </div>
+
+            <div class="days-list">
+              {group.days.map((day) => (
+                <div class="day-card">
+                  <div class="day-header">
+                    <h3>{day.title || formatDayName(day.dayName)}</h3>
+                  </div>
+
+                  <div class="day-links">
+                    <a href={`/${day.path}/`} class="link-btn primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                      </svg>
+                      Slides
+                    </a>
+
+                    {day.hasExercises && (
+                      <a href={`/${day.path}/exercices`} class="link-btn exercices">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Exercises
+                      </a>
+                    )}
+
+                    {day.hasCorrections && (
+                      <a href={`/${day.path}/corrections`} class="link-btn corrections">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Corrections
+                      </a>
+                    )}
+                  </div>
+
+                  {day.tags && day.tags.length > 0 && (
+                    <div class="tags">
+                      {day.tags.map((tag) => (
+                        <span class="tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      )
+    }
+  </main>
+</BaseLayout>

@@ -1,0 +1,59 @@
+---
+/**
+ * DocumentRenderer.astro
+ * Renders markdown content for exercise and correction pages.
+ * Uses server-side markdown rendering.
+ */
+
+import { marked } from 'marked';
+
+interface Props {
+  /** Raw markdown content to render */
+  content: string;
+  /** Deck path for resolving image URLs (e.g., "ddd/session-1") */
+  deckPath: string;
+  /** Type of document for styling */
+  type: 'exercices' | 'corrections';
+}
+
+const { content, deckPath, type } = Astro.props;
+
+/**
+ * Transform image paths from relative to public paths.
+ * Uses /decks/{path}/_images/ prefix instead of /@fs/ to avoid the dev-only path bug.
+ */
+function transformImagePaths(markdown: string, basePath: string): string {
+  const imagesBase = `/decks/${basePath}/_images`;
+
+  return markdown.replace(
+    /!\[([^\]]*)\]\((?!http)([^)]+)\)/g,
+    (match, alt, src) => {
+      // Handle _images/ prefix
+      if (src.startsWith('_images/') || src.startsWith('./_images/')) {
+        const cleanSrc = src.replace('./', '');
+        return `![${alt}](${imagesBase}/${cleanSrc.replace('_images/', '')})`;
+      }
+      // Handle relative paths
+      if (!src.startsWith('/') && !src.startsWith('http')) {
+        return `![${alt}](${imagesBase}/${src})`;
+      }
+      return match;
+    }
+  );
+}
+
+// Configure marked for GFM (GitHub Flavored Markdown)
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+const transformedContent = transformImagePaths(content, deckPath);
+const htmlContent = await marked.parse(transformedContent);
+---
+
+<article class="document-article" data-type={type}>
+  <div class="markdown-content">
+    <Fragment set:html={htmlContent} />
+  </div>
+</article>

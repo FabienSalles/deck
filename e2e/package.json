@@ -1,0 +1,19 @@
+{
+  "name": "@conveycode/deck-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "preview": "astro preview --port 4322",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@conveycode/deck": "file:..",
+    "astro": "^5.1.0",
+    "sass": "^1.83.0",
+    "mermaid": "^11.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

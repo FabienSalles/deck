@@ -1,0 +1,134 @@
+---
+/**
+ * DocumentNavigation.astro
+ * Navigation component for multi-page documents (exercises/corrections).
+ * Shows a list of available pages with active state.
+ */
+
+interface Page {
+  /** Page number (1-based) */
+  number: number;
+  /** Page title extracted from markdown H1 or filename */
+  title: string;
+  /** URL to this page */
+  url: string;
+  /** Whether this is the current page */
+  active: boolean;
+}
+
+interface Props {
+  /** List of all pages in the document */
+  pages: Page[];
+  /** Current page number */
+  currentPage: number;
+  /** Base URL for the document (e.g., "/ddd/session-1/exercices") */
+  baseUrl: string;
+}
+
+const { pages, currentPage, baseUrl } = Astro.props;
+
+// Calculate prev/next
+const prevPage = currentPage > 1 ? pages[currentPage - 2] : null;
+const nextPage = currentPage < pages.length ? pages[currentPage] : null;
+---
+
+{
+  pages.length > 1 && (
+    <nav class="document-navigation" aria-label="Document navigation">
+      <div class="nav-pages">
+        <span class="nav-label">Pages:</span>
+        <ul class="page-list">
+          {pages.map((page) => (
+            <li>
+              <a
+                href={page.url}
+                class:list={['page-link', { active: page.active }]}
+                aria-current={page.active ? 'page' : undefined}
+              >
+                {page.number}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="nav-arrows">
+        {prevPage ? (
+          <a href={prevPage.url} class="nav-arrow prev" title={prevPage.title}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span>Previous</span>
+          </a>
+        ) : (
+          <span class="nav-arrow prev disabled">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span>Previous</span>
+          </span>
+        )}
+
+        <span class="page-indicator">
+          {currentPage} / {pages.length}
+        </span>
+
+        {nextPage ? (
+          <a href={nextPage.url} class="nav-arrow next" title={nextPage.title}>
+            <span>Next</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </a>
+        ) : (
+          <span class="nav-arrow next disabled">
+            <span>Next</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </span>
+        )}
+      </div>
+    </nav>
+  )
+}

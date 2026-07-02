@@ -1,0 +1,414 @@
+@use './variables' as *;
+
+// =============================================================================
+// Print styles for Document pages (Exercises & Corrections)
+// Creates a clean PDF-like output without browser artifacts
+// =============================================================================
+
+// Browser print (@media print)
+@media print {
+  // Page setup - margins set to 0 to control everything ourselves
+  // User should uncheck "Headers and footers" in print dialog for cleanest output
+  @page {
+    size: A4;
+    margin: 15mm 20mm;
+  }
+
+  // Preserve colors
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  // Hide browser elements
+  astro-dev-toolbar {
+    display: none !important;
+  }
+
+  // Reset document - MUST use !important to override global.scss
+  html,
+  body {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 0;
+    padding: 0;
+    background: white;
+    font-size: 11pt;
+  }
+
+  // Document page container - MUST use !important to override document.scss
+  .document-page {
+    min-height: auto !important;
+    height: auto !important;
+    display: block !important;
+    background: white;
+
+    // Custom print header - clean and professional
+    .document-header {
+      position: relative;
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 8mm;
+      border-bottom: 0.5pt solid #333;
+      padding-bottom: 4mm;
+
+      .header-content {
+        gap: 3mm;
+      }
+
+      // Hide navigation
+      .back-link,
+      .document-actions {
+        display: none !important;
+      }
+
+      // Deck badge - subtle in print
+      .formation-badge {
+        font-size: 9pt;
+        padding: 1mm 3mm;
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      // Title
+      h1 {
+        font-size: 16pt;
+        font-weight: 600;
+        margin: 0;
+        color: #000;
+      }
+    }
+
+    // Hide footer completely
+    .document-footer {
+      display: none !important;
+    }
+  }
+
+  // Main content - clean typography for print
+  .document-content {
+    max-width: 100%;
+    padding: 0;
+
+    // Typography optimized for print
+    h1 {
+      font-size: 16pt;
+      margin-top: 6mm;
+      margin-bottom: 3mm;
+      border-bottom: none;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 14pt;
+      margin-top: 5mm;
+      margin-bottom: 2mm;
+      color: #000;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 12pt;
+      margin-top: 4mm;
+      margin-bottom: 2mm;
+      page-break-after: avoid;
+    }
+
+    h4,
+    h5,
+    h6 {
+      font-size: 11pt;
+      margin-top: 3mm;
+      margin-bottom: 2mm;
+      page-break-after: avoid;
+    }
+
+    p {
+      font-size: 11pt;
+      line-height: 1.5;
+      margin-bottom: 2mm;
+      orphans: 3;
+      widows: 3;
+    }
+
+    // Lists
+    ul,
+    ol {
+      margin-bottom: 3mm;
+      padding-left: 8mm;
+
+      li {
+        margin-bottom: 1mm;
+        page-break-inside: avoid;
+      }
+    }
+
+    // Code blocks - clean borders for print
+    pre {
+      font-size: 9pt;
+      line-height: 1.4;
+      padding: 3mm;
+      margin: 3mm 0;
+      background: #f8f8f8 !important;
+      border: 0.5pt solid #ccc;
+      border-radius: 2mm;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      page-break-inside: avoid;
+
+      code {
+        font-size: 9pt;
+        background: none;
+        padding: 0;
+      }
+    }
+
+    // Inline code
+    code {
+      font-size: 10pt;
+      padding: 0.5mm 1.5mm;
+      background: #f0f0f0;
+      border-radius: 1mm;
+    }
+
+    // Blockquotes
+    blockquote {
+      margin: 3mm 0;
+      padding: 2mm 4mm;
+      border-left: 1mm solid #666;
+      background: #f8f8f8;
+      font-style: italic;
+      page-break-inside: avoid;
+    }
+
+    // Tables
+    table {
+      width: 100%;
+      margin: 3mm 0;
+      border-collapse: collapse;
+      font-size: 10pt;
+      page-break-inside: avoid;
+
+      th,
+      td {
+        padding: 2mm 3mm;
+        border: 0.5pt solid #333;
+        text-align: left;
+      }
+
+      th {
+        background: #f0f0f0;
+        font-weight: 600;
+      }
+
+      tr:nth-child(even) {
+        background: #fafafa;
+      }
+    }
+
+    // Images
+    img {
+      max-width: 100%;
+      height: auto;
+      page-break-inside: avoid;
+    }
+
+    // Horizontal rules (exercise separators)
+    hr {
+      border: none;
+      border-top: 0.5pt solid #ccc;
+      margin: 6mm 0;
+      page-break-after: avoid;
+    }
+
+    // Links - don't show URLs, keep text clean
+    a {
+      color: #000;
+      text-decoration: underline;
+
+      &::after {
+        content: none !important;
+      }
+    }
+  }
+
+  // Exercise/Correction sections
+  .exercise-section,
+  .correction-section {
+    page-break-inside: avoid;
+
+    &:not(:last-child) {
+      margin-bottom: 8mm;
+    }
+  }
+
+  // Exercise separator - page break friendly
+  .exercise-separator,
+  .correction-separator {
+    border: none;
+    border-top: 0.5pt dashed #999;
+    margin: 8mm 0;
+  }
+}
+
+// =============================================================================
+// Puppeteer/Headless browser export mode (?print parameter)
+// For automated PDF generation - must mirror @media print styles
+// =============================================================================
+html.print-mode .document-page {
+  // Critical: reset min-height so content flows naturally
+  min-height: auto !important;
+  display: block;
+  background: white;
+
+  .document-header {
+    position: relative;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+
+    .header-content {
+      gap: 0.5rem;
+    }
+
+    .back-link,
+    .document-actions {
+      display: none !important;
+    }
+
+    .formation-badge {
+      font-size: 0.75rem;
+      padding: 0.125rem 0.5rem;
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+      color: #000;
+      border: none;
+      padding: 0;
+    }
+  }
+
+  .document-footer {
+    display: none !important;
+  }
+
+  .document-content {
+    max-width: 100%;
+    padding: 0;
+
+    h1 {
+      font-size: 1.25rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: none;
+    }
+
+    h2 {
+      font-size: 1.125rem;
+      margin-top: 0.75rem;
+      margin-bottom: 0.375rem;
+      color: #000;
+    }
+
+    h3 {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    ul,
+    ol {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+
+      li {
+        margin-bottom: 0.25rem;
+      }
+    }
+
+    pre {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      background: #f8f8f8 !important;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow: visible;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+
+      code {
+        font-size: 0.8rem;
+        background: none;
+        padding: 0;
+      }
+    }
+
+    code {
+      font-size: 0.85rem;
+      padding: 0.125rem 0.25rem;
+      background: #f0f0f0;
+      border-radius: 2px;
+    }
+
+    blockquote {
+      margin: 0.5rem 0;
+      padding: 0.375rem 0.75rem;
+      border-left: 3px solid #666;
+      background: #f8f8f8;
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      margin: 0.5rem 0;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+
+      th,
+      td {
+        padding: 0.375rem 0.5rem;
+        border: 1px solid #333;
+        text-align: left;
+      }
+
+      th {
+        background: #f0f0f0;
+        font-weight: 600;
+      }
+
+      tr:nth-child(even) {
+        background: #fafafa;
+      }
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 1rem 0;
+    }
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
+  }
+}

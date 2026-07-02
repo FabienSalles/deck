@@ -1,0 +1,88 @@
+@use './variables' as *;
+
+// Print-specific styles for Reveal.js PDF export
+// Applies to: ?print-pdf URL, HeadlessChrome (Decktape)
+
+html.reveal-print {
+  // Ensure colors are preserved in print
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  // Hide Astro dev toolbar
+  astro-dev-toolbar {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  // Fix h1 gradient text - must be solid color for print
+  .reveal h1 {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: $brand-primary !important;
+    color: $brand-primary !important;
+  }
+
+  // Hide navigation controls
+  .reveal .controls,
+  .reveal .progress {
+    display: none !important;
+  }
+
+  // Remove overflow warning
+  .reveal .slides section.content-overflow-warning {
+    border: none !important;
+
+    &::after {
+      display: none !important;
+    }
+  }
+
+  // Ensure blockquotes are fully visible
+  .reveal blockquote {
+    overflow: visible !important;
+
+    &::before {
+      display: none !important;
+    }
+  }
+
+  // Tables - ensure visibility
+  .reveal table {
+    font-size: 0.85em !important;
+  }
+
+  // Fragments - show all
+  .reveal .fragment {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  // Slide numbers
+  .reveal .slide-number-pdf {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+// Browser print fallback
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  astro-dev-toolbar {
+    display: none !important;
+  }
+
+  .reveal h1 {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: $brand-primary !important;
+    color: $brand-primary !important;
+  }
+}

@@ -1,0 +1,82 @@
+---
+/**
+ * Exercise menu page — Lists all exercises for a deck session.
+ * URL: /{deck}/{session}/exercices
+ */
+
+import path from 'node:path';
+import config from 'virtual:deck/config';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  loadDeckMeta,
+  findDeckPathsWithSubfolder,
+  loadExerciseInfos,
+} from '../../../content/infrastructure/content-loader';
+import type { DeckMeta, ExerciseInfo } from '../../../content/domain/slide.model';
+import '../../../styles/exercise-menu.scss';
+
+export async function getStaticPaths() {
+  const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+  const deckPaths = findDeckPathsWithSubfolder(contentDir, 'exercices');
+
+  const paths: Array<{
+    params: { path: string };
+    props: { exercises: ExerciseInfo[]; meta: DeckMeta; deckPath: string };
+  }> = [];
+
+  for (const deckPath of deckPaths) {
+    const meta = loadDeckMeta(contentDir, deckPath);
+    const exercises = loadExerciseInfos(contentDir, deckPath, 'exercices');
+
+    if (exercises.length === 0) {
+      continue;
+    }
+
+    paths.push({
+      params: { path: deckPath },
+      props: { exercises, meta, deckPath },
+    });
+  }
+
+  return paths;
+}
+
+const { path: deckPath } = Astro.params;
+const { exercises, meta } = Astro.props;
+---
+
+<BaseLayout title={`Exercises - ${meta.title}`}>
+  <div class="exercise-menu-page">
+    <header class="menu-header">
+      <a href="/" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Home
+      </a>
+      <span class="formation-badge">{meta.title}</span>
+    </header>
+
+    <main class="menu-content">
+      <h1>Exercises</h1>
+
+      <div class="exercise-list">
+        {exercises.map((exercise) => (
+          <a href={`/${deckPath}/exercices/${exercise.num}`} class="exercise-card">
+            <span class="exercise-number">{exercise.num}</span>
+            <span class="exercise-title">{exercise.title}</span>
+            <span class="exercise-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </main>
+
+    <footer class="menu-footer">
+      <span class="copyright">{meta.title} - Exercises</span>
+    </footer>
+  </div>
+</BaseLayout>

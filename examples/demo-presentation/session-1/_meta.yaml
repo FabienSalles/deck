@@ -1,0 +1,13 @@
+id: demo-session-1
+title: "Demo Presentation - Session 1"
+tags:
+  - demo
+  - getting-started
+
+reveal:
+  controls: true
+  progress: true
+  slideNumber: "c/t"
+  hash: true
+  transition: "slide"
+  transitionSpeed: "default"

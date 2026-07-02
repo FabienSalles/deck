@@ -1,0 +1,45 @@
+---
+/**
+ * Presentation page — Renders a Reveal.js slide deck.
+ * URL: /{deck}/{session}/
+ */
+
+import { getCollection } from 'astro:content';
+import config from 'virtual:deck/config';
+import path from 'node:path';
+import PresentationLayout from '../layouts/PresentationLayout.astro';
+import RevealPresentation from '../components/RevealPresentation.astro';
+import { loadDeckMeta } from '../content/infrastructure/content-loader';
+import { groupSlidesByDeck } from '../content/domain/slide.service';
+import { SlideCollection } from '../content/domain/slide.model';
+import type { DeckMeta } from '../content/domain/slide.model';
+
+export async function getStaticPaths() {
+  const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+  const allSlides = await getCollection(config.collection as any);
+  const deckGroups = groupSlidesByDeck(allSlides);
+
+  const paths = [];
+
+  for (const [deckPath, slides] of deckGroups) {
+    const meta = loadDeckMeta(contentDir, deckPath);
+
+    paths.push({
+      params: { slug: deckPath },
+      props: { slides, meta },
+    });
+  }
+
+  return paths;
+}
+
+const { slug } = Astro.params;
+const { slides, meta } = Astro.props as { slides: Array<{ id: string; body: string }>; meta: DeckMeta };
+
+// Wrap raw slides into an immutable SlideCollection
+const slideCollection = new SlideCollection(slides);
+---
+
+<PresentationLayout title={meta.title}>
+  <RevealPresentation slides={slideCollection} config={meta.reveal || {}} deckPath={slug!} />
+</PresentationLayout>

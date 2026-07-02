@@ -1,0 +1,94 @@
+@use 'sass:color';
+@use './variables' as *;
+
+// Mermaid diagram responsive styles
+
+// Cluster (subgraph) label styling - make title width fit content
+.cluster-label {
+  .nodeLabel {
+    white-space: nowrap;
+  }
+}
+
+.mermaid-diagram {
+  // Custom scrollbar for better UX
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-accent);
+    border-radius: $radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $brand-primary;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: color.scale($brand-primary, $lightness: -18.75%);
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: $brand-primary var(--bg-accent);
+
+  // Ensure diagrams are centered
+  .mermaid-svg-wrapper {
+    svg {
+      // Smooth scaling
+      transition: transform 200ms ease-in-out;
+
+      // Ensure text is readable
+      text {
+        font-family: $font-family-sans !important;
+      }
+
+      // Improve node visibility
+      .node rect,
+      .node circle,
+      .node ellipse,
+      .node polygon {
+        stroke-width: 2px;
+      }
+
+      // Better label contrast
+      .label {
+        font-weight: 500;
+      }
+
+      // Flowchart edge labels
+      .edgeLabel {
+        background-color: var(--bg-secondary);
+        padding: 2px 6px;
+        border-radius: $radius-sm;
+      }
+    }
+  }
+}
+
+// Scale down very large diagrams
+@media (max-width: $breakpoint-md) {
+  .mermaid-diagram {
+    max-height: 60vh;
+
+    .mermaid-svg-wrapper svg {
+      max-height: 55vh;
+    }
+  }
+}
+
+// Print styles for diagrams
+@media print {
+  .mermaid-diagram {
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-inside: avoid;
+
+    .mermaid-svg-wrapper svg {
+      max-height: none !important;
+    }
+  }
+}

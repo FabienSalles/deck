@@ -1,0 +1,82 @@
+---
+/**
+ * Correction menu page — Lists all corrections for a deck session.
+ * URL: /{deck}/{session}/corrections
+ */
+
+import path from 'node:path';
+import config from 'virtual:deck/config';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  loadDeckMeta,
+  findDeckPathsWithSubfolder,
+  loadExerciseInfos,
+} from '../../../content/infrastructure/content-loader';
+import type { DeckMeta, ExerciseInfo } from '../../../content/domain/slide.model';
+import '../../../styles/exercise-menu.scss';
+
+export async function getStaticPaths() {
+  const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+  const deckPaths = findDeckPathsWithSubfolder(contentDir, 'corrections');
+
+  const paths: Array<{
+    params: { path: string };
+    props: { corrections: ExerciseInfo[]; meta: DeckMeta; deckPath: string };
+  }> = [];
+
+  for (const deckPath of deckPaths) {
+    const meta = loadDeckMeta(contentDir, deckPath);
+    const corrections = loadExerciseInfos(contentDir, deckPath, 'corrections');
+
+    if (corrections.length === 0) {
+      continue;
+    }
+
+    paths.push({
+      params: { path: deckPath },
+      props: { corrections, meta, deckPath },
+    });
+  }
+
+  return paths;
+}
+
+const { path: deckPath } = Astro.params;
+const { corrections, meta } = Astro.props;
+---
+
+<BaseLayout title={`Corrections - ${meta.title}`}>
+  <div class="exercise-menu-page" data-type="corrections">
+    <header class="menu-header">
+      <a href="/" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Home
+      </a>
+      <span class="formation-badge">{meta.title}</span>
+    </header>
+
+    <main class="menu-content">
+      <h1>Corrections</h1>
+
+      <div class="exercise-list">
+        {corrections.map((correction) => (
+          <a href={`/${deckPath}/corrections/${correction.num}`} class="exercise-card">
+            <span class="exercise-number">{correction.num}</span>
+            <span class="exercise-title">{correction.title}</span>
+            <span class="exercise-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </main>
+
+    <footer class="menu-footer">
+      <span class="copyright">{meta.title} - Corrections</span>
+    </footer>
+  </div>
+</BaseLayout>

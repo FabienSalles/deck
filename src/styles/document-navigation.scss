@@ -1,0 +1,127 @@
+@use './variables' as *;
+
+// =============================================================================
+// Document Navigation Component
+// Navigation for multi-page documents (exercises/corrections)
+// =============================================================================
+
+.document-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+.nav-pages {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nav-label {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6c757d);
+  font-weight: 500;
+}
+
+.page-list {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #495057);
+  text-decoration: none;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 0.375rem;
+  transition: all 150ms ease-in-out;
+
+  &:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+  }
+
+  &.active {
+    color: white;
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+}
+
+.nav-arrows {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #495057);
+  text-decoration: none;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 0.5rem;
+  transition: all 150ms ease-in-out;
+
+  &:hover:not(.disabled) {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.page-indicator {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6c757d);
+  font-weight: 500;
+}
+
+// Hide in print mode
+@media print {
+  .document-navigation {
+    display: none;
+  }
+}
+
+.print-mode .document-navigation {
+  display: none;
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .nav-arrow span {
+    display: none;
+  }
+
+  .nav-arrow {
+    padding: 0.5rem;
+  }
+}

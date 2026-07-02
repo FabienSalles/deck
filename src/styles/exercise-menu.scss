@@ -1,0 +1,189 @@
+@use './variables' as *;
+
+/**
+ * Styles for the exercise menu page
+ * Supports both exercises (blue) and corrections (green)
+ */
+
+.exercise-menu-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-family-sans;
+  background: $bg-secondary;
+
+  // Default: exercises (blue)
+  --accent-color: #{$brand-primary};
+  --accent-light: #{rgba($brand-primary, 0.1)};
+
+  // Corrections variant (green)
+  &[data-type='corrections'] {
+    --accent-color: #{$brand-success};
+    --accent-light: #{rgba($brand-success, 0.1)};
+  }
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: $text-secondary;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: var(--accent-color);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.formation-badge {
+  padding: 0.35rem 0.75rem;
+  background: var(--accent-light);
+  color: var(--accent-color);
+  border-radius: $radius-sm;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.menu-content {
+  flex: 1;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem;
+  }
+}
+
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.exercise-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+
+  &:hover {
+    transform: translateX(4px);
+    box-shadow: $shadow-md;
+    border-color: var(--accent-color);
+
+    .exercise-number {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .exercise-arrow {
+      color: var(--accent-color);
+      transform: translateX(2px);
+    }
+  }
+}
+
+.exercise-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--accent-light);
+  color: var(--accent-color);
+  border-radius: $radius-md;
+  font-size: 1rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+}
+
+.exercise-title {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.exercise-arrow {
+  color: #9ca3af;
+  transition:
+    color 0.2s,
+    transform 0.2s;
+
+  svg {
+    display: block;
+  }
+}
+
+.menu-footer {
+  padding: 1rem 2rem;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+
+  .copyright {
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-header {
+    padding: 1rem;
+  }
+
+  .menu-content {
+    padding: 1.5rem 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .exercise-card {
+    padding: 0.875rem 1rem;
+  }
+
+  .exercise-number {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+  }
+
+  .exercise-title {
+    font-size: 0.9rem;
+  }
+}

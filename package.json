@@ -1,0 +1,84 @@
+{
+  "name": "@conveycode/deck",
+  "version": "0.1.0",
+  "description": "Astro integration for Reveal.js presentations with exercises, corrections, and PDF export",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/integration/index.js",
+      "types": "./dist/integration/index.d.ts"
+    },
+    "./content": {
+      "import": "./dist/content/index.js",
+      "types": "./dist/content/index.d.ts"
+    },
+    "./reveal": {
+      "import": "./dist/reveal/index.js",
+      "types": "./dist/reveal/index.d.ts"
+    },
+    "./all": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./components/*": "./dist/components/*",
+    "./styles/*": "./dist/styles/*",
+    "./pages/*": "./dist/pages/*",
+    "./virtual": {
+      "types": "./dist/virtual.d.ts"
+    }
+  },
+  "bin": {
+    "deck-pdf": "./dist/pdf-export/index.js"
+  },
+  "files": [
+    "dist/",
+    "examples/",
+    "templates/"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-imports.js && node scripts/copy-assets.js",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "astro": "^5.0.0",
+    "mermaid": "^11.0.0"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "js-yaml": "^4.1.0",
+    "marked": "^17.0.0",
+    "reveal.js": "^5.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "astro": "^5.1.0",
+    "mermaid": "^11.13.0",
+    "sass": "^1.83.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "decktape": "^3.14.0",
+    "puppeteer": "^24.0.0"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "reveal.js",
+    "presentations",
+    "slides",
+    "pdf-export"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conveycode/deck"
+  }
+}

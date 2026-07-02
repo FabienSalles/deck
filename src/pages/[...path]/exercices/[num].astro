@@ -1,0 +1,265 @@
+---
+/**
+ * Individual exercise page.
+ * URL: /{deck}/{session}/exercices/{num}
+ *
+ * Displays a single exercise with navigation.
+ */
+
+import path from 'node:path';
+import config from 'virtual:deck/config';
+import DocumentLayout from '../../../layouts/DocumentLayout.astro';
+import DocumentRenderer from '../../../components/DocumentRenderer.astro';
+import {
+  loadDeckMeta,
+  findDeckPathsWithSubfolder,
+  loadExerciseData,
+  getCorrectionNumbers,
+} from '../../../content/infrastructure/content-loader';
+import type { DeckMeta, ExerciseData } from '../../../content/domain/slide.model';
+
+interface PathData {
+  params: { path: string; num: string };
+  props: {
+    exercise: ExerciseData;
+    meta: DeckMeta;
+    deckPath: string;
+    total: number;
+    prevNum: string | null;
+    nextNum: string | null;
+    hasCorrection: boolean;
+  };
+}
+
+export async function getStaticPaths(): Promise<PathData[]> {
+  const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+  const deckPaths = findDeckPathsWithSubfolder(contentDir, 'exercices');
+  const paths: PathData[] = [];
+
+  for (const deckPath of deckPaths) {
+    const meta = loadDeckMeta(contentDir, deckPath);
+    const exercises = loadExerciseData(contentDir, deckPath, 'exercices');
+
+    if (exercises.length === 0) {
+      continue;
+    }
+
+    const correctionNums = getCorrectionNumbers(contentDir, deckPath);
+
+    exercises.forEach((exercise, index) => {
+      const prevNum = index > 0 ? exercises[index - 1].num : null;
+      const nextNum = index < exercises.length - 1 ? exercises[index + 1].num : null;
+      const hasCorrection = correctionNums.has(exercise.num);
+
+      paths.push({
+        params: { path: deckPath, num: exercise.num },
+        props: {
+          exercise,
+          meta,
+          deckPath,
+          total: exercises.length,
+          prevNum,
+          nextNum,
+          hasCorrection,
+        },
+      });
+    });
+  }
+
+  return paths;
+}
+
+const { num } = Astro.params;
+const { exercise, meta, deckPath, total, prevNum, nextNum, hasCorrection } = Astro.props;
+const currentIndex = parseInt(num || '1', 10);
+---
+
+<DocumentLayout
+  title={`Exercise ${num}`}
+  deckTitle={meta.title}
+  type="exercices"
+>
+  <nav class="exercise-nav">
+    <a href={`/${deckPath}/exercices`} class="nav-back">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Exercises menu
+    </a>
+    <span class="nav-position">Exercise {currentIndex}/{total}</span>
+    <div class="nav-arrows">
+      {prevNum ? (
+        <a href={`/${deckPath}/exercices/${prevNum}`} class="nav-arrow" title="Previous exercise">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </a>
+      ) : (
+        <span class="nav-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </span>
+      )}
+      {nextNum ? (
+        <a href={`/${deckPath}/exercices/${nextNum}`} class="nav-arrow" title="Next exercise">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+      ) : (
+        <span class="nav-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </span>
+      )}
+    </div>
+  </nav>
+
+  <section class="exercise-content">
+    <DocumentRenderer
+      content={exercise.content}
+      deckPath={deckPath!}
+      type="exercices"
+    />
+  </section>
+
+  <div class="exercise-footer-nav">
+    {hasCorrection && (
+      <a href={`/${deckPath}/corrections/${num}`} class="correction-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        View correction
+      </a>
+    )}
+    {nextNum && (
+      <a href={`/${deckPath}/exercices/${nextNum}`} class="next-exercise-btn">
+        Next exercise
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </a>
+    )}
+  </div>
+</DocumentLayout>
+
+<style>
+  .exercise-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #f8f9fa);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary, #2563eb);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .nav-back:hover {
+    text-decoration: underline;
+  }
+
+  .nav-position {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+
+  .nav-arrows {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--color-surface-hover, #e5e7eb);
+    color: var(--color-text, #1f2937);
+    transition: background-color 0.2s;
+  }
+
+  .nav-arrow:hover:not(.disabled) {
+    background: var(--color-primary, #2563eb);
+    color: white;
+  }
+
+  .nav-arrow.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .exercise-content {
+    min-height: 300px;
+  }
+
+  .exercise-footer-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .correction-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    color: var(--color-primary, #2563eb);
+    border: 2px solid var(--color-primary, #2563eb);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .correction-btn:hover {
+    background: var(--color-primary, #2563eb);
+    color: white;
+  }
+
+  .next-exercise-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-primary, #2563eb);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .next-exercise-btn:hover {
+    background: var(--color-primary-dark, #1d4ed8);
+  }
+
+  @media print {
+    .exercise-nav,
+    .exercise-footer-nav {
+      display: none;
+    }
+  }
+</style>

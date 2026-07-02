@@ -1,0 +1,655 @@
+@use 'sass:color';
+@use './variables' as *;
+
+// Base Reveal.js Theme Override - Light theme only
+.reveal {
+  // Default code font size (can be overridden per slide)
+  --code-font-size: #{$font-size-code};
+
+  font-family: $font-family-sans;
+  font-size: $font-size-base;
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+
+  // Headings
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: $font-family-heading;
+    font-weight: 700;
+    line-height: $line-height-heading;
+    letter-spacing: -0.02em;
+    margin: 0 0 $spacing-md;
+    color: var(--text-primary);
+    text-transform: none;
+  }
+
+  h1 {
+    font-size: $font-size-h1;
+    margin-bottom: $spacing-lg;
+    // Gradient text - only works in regular browser mode
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    // Fix for print mode - solid color instead of gradient
+    @media print {
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+      -webkit-text-fill-color: $brand-primary !important;
+      color: $brand-primary !important;
+    }
+  }
+
+  // Also fix h1 when reveal-print class is present (for ?print-pdf)
+  &.reveal-print h1,
+  html.reveal-print & h1 {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: $brand-primary !important;
+    color: $brand-primary !important;
+  }
+
+  h2 {
+    font-size: $font-size-h2;
+    border-bottom: 3px solid $brand-primary;
+    padding-bottom: $spacing-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  h3 {
+    font-size: $font-size-h3;
+    color: $brand-primary;
+  }
+
+  // Paragraphs and Text
+  p {
+    line-height: $line-height-base;
+    margin: 0 0 $spacing-sm;
+  }
+
+  // Links
+  a {
+    color: $brand-primary;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all $transition-base;
+
+    &:hover {
+      border-bottom-color: $brand-primary;
+      color: color.scale($brand-primary, $lightness: -18.75%);
+    }
+  }
+
+  // Lists
+  ul,
+  ol {
+    line-height: $line-height-base;
+    margin: 0 0 $spacing-md;
+
+    li {
+      margin-bottom: $spacing-sm;
+
+      &::marker {
+        color: $brand-primary;
+        font-weight: 600;
+      }
+    }
+  }
+
+  ul {
+    list-style-type: none;
+
+    li::before {
+      content: '\25B8';
+      color: $brand-primary;
+      font-weight: bold;
+      display: inline-block;
+      width: 1.5em;
+      margin-left: -1.5em;
+    }
+  }
+
+  // Compact list style for dense content
+  .compact-list,
+  &.compact-list {
+    p {
+      margin-bottom: $spacing-xs;
+    }
+
+    ul,
+    ol {
+      margin-top: $spacing-xs;
+      margin-bottom: $spacing-xs;
+
+      li {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  // Code blocks
+  pre {
+    margin: $spacing-md 0;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary) !important;
+
+    code {
+      font-family: $font-family-mono;
+      font-size: var(--code-font-size);
+      line-height: $line-height-code;
+      padding: $spacing-md;
+      max-height: 600px;
+      overflow: auto;
+      display: block;
+    }
+
+    // Auto-resized code blocks have reduced padding
+    &.auto-resized code {
+      padding: 0.5rem !important;
+      line-height: 1.4;
+    }
+
+    // Smaller code blocks for dense slides
+    &.small-code code {
+      font-size: 0.75rem;
+      line-height: 1.3;
+      padding: 0.5rem;
+    }
+
+    // Custom scrollbar for code blocks
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+
+  // Inline code
+  code:not(pre code) {
+    font-family: $font-family-mono;
+    background: var(--bg-accent);
+    color: $brand-secondary;
+    padding: 0.2em 0.4em;
+    border-radius: $radius-sm;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+
+  // Blockquotes
+  blockquote {
+    margin: $spacing-md 0;
+    padding: $spacing-md $spacing-lg;
+    border-left: 5px solid $brand-primary;
+    background: var(--bg-secondary);
+    border-radius: $radius-md;
+    font-style: italic;
+    box-shadow: $shadow-sm;
+
+    p {
+      margin-bottom: 0;
+    }
+
+    &::before {
+      content: '\201C';
+      font-size: 3em;
+      color: $brand-primary;
+      opacity: 0.3;
+      position: absolute;
+      margin-top: -0.4em;
+      margin-left: -0.5em;
+    }
+  }
+
+  // Compact quotes - reduced margins for dense content
+  .compact-quote,
+  &.compact-quote {
+    blockquote {
+      margin: 0.25rem 0;
+      padding: 0.4rem 0.6rem 0.4rem 0.8rem;
+      border-left-width: 3px;
+      font-size: 0.85em;
+      border-radius: $radius-sm;
+      box-shadow: none;
+
+      &::before {
+        display: none;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.3;
+      }
+    }
+  }
+
+  // Tables
+  table {
+    margin: $spacing-md auto;
+    border-collapse: collapse;
+    border-radius: $radius-md;
+    overflow: hidden;
+    box-shadow: $shadow-md;
+
+    thead {
+      background: $gradient-primary;
+      color: white;
+    }
+
+    th,
+    td {
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid var(--border);
+    }
+
+    tbody tr {
+      &:nth-child(even) {
+        background: var(--bg-secondary);
+      }
+
+      &:hover {
+        background: var(--bg-accent);
+      }
+    }
+
+    // Fix for fragment rows: borders follow row visibility
+    &:has(tr.fragment) {
+      border-collapse: separate;
+      border-spacing: 0;
+      box-shadow: none; // Remove global shadow, let borders do the work
+
+      th,
+      td {
+        border: none;
+      }
+
+      // Header row (always visible): top and side borders
+      thead tr {
+        th {
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+
+          &:first-child {
+            border-left: 1px solid var(--border);
+          }
+
+          &:last-child {
+            border-right: 1px solid var(--border);
+          }
+        }
+      }
+
+      // Fragment rows: borders only when visible
+      tbody tr.fragment {
+        td {
+          border-bottom: 1px solid transparent;
+
+          &:first-child {
+            border-left: 1px solid transparent;
+          }
+
+          &:last-child {
+            border-right: 1px solid transparent;
+          }
+        }
+
+        &.visible td {
+          border-bottom-color: var(--border);
+
+          &:first-child {
+            border-left-color: var(--border);
+          }
+
+          &:last-child {
+            border-right-color: var(--border);
+          }
+        }
+      }
+
+      // Hide header borders when no fragment is visible yet
+      &:not(:has(tr.fragment.visible)) {
+        thead tr th {
+          border-color: transparent;
+        }
+      }
+    }
+  }
+
+  // Images
+  img {
+    display: block;
+    margin: 0 auto;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    max-width: 100%;
+
+    // Plain image without shadow and border-radius
+    &.img-plain {
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      background: none;
+    }
+  }
+
+  // Exercise/Correction links (clickable images in slides)
+  .exercise-link {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    position: relative;
+    border-bottom: none !important;
+    transition:
+      transform $transition-fast,
+      box-shadow $transition-fast;
+
+    &:hover {
+      transform: scale(1.02);
+      border-bottom: none !important;
+
+      img {
+        box-shadow: 0 8px 25px rgba($brand-primary, 0.3);
+      }
+
+      &::after {
+        opacity: 1;
+      }
+    }
+
+    // Visual indicator for clickable exercise
+    &::after {
+      content: 'Open';
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 0.25rem 0.5rem;
+      background: rgba($brand-primary, 0.9);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: $radius-sm;
+      opacity: 0;
+      transition: opacity $transition-fast;
+    }
+
+    img {
+      transition: box-shadow $transition-fast;
+    }
+  }
+
+  // Strong and emphasis
+  strong,
+  b {
+    font-weight: 700;
+    color: $brand-primary;
+  }
+
+  em {
+    font-style: italic;
+    color: $brand-secondary;
+  }
+
+  // Slides
+  .slides {
+    section {
+      padding: $spacing-xl;
+      text-align: left;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      &.center {
+        text-align: center;
+        justify-content: center;
+      }
+
+      &.title-slide {
+        text-align: center;
+        background: $gradient-primary;
+        color: white;
+
+        h1,
+        h2,
+        h3 {
+          color: white;
+          -webkit-text-fill-color: white;
+        }
+      }
+
+      &.small-content {
+        font-size: 0.85em;
+
+        ul,
+        ol {
+          li {
+            margin-bottom: 0.3em;
+          }
+        }
+      }
+
+      &.smaller-content {
+        font-size: 0.75em;
+
+        ul,
+        ol {
+          li {
+            margin-bottom: 0.3em;
+          }
+        }
+      }
+
+      &.smallest-content {
+        font-size: 0.65em;
+
+        ul,
+        ol {
+          li {
+            margin-bottom: 0.2em;
+          }
+        }
+      }
+
+      &.compact-table {
+        font-size: 0.65em;
+        padding: 1.5rem !important;
+
+        h2 {
+          font-size: 1.8em;
+          margin-bottom: 1.2rem;
+        }
+
+        table {
+          font-size: 1em;
+          margin: 0.5rem auto;
+
+          th,
+          td {
+            padding: 0.3rem 0.5rem;
+            line-height: 1.3;
+            vertical-align: top;
+          }
+
+          th {
+            font-size: 0.95em;
+          }
+
+          td {
+            font-size: 0.9em;
+          }
+        }
+
+        p,
+        ul {
+          font-size: 0.85em;
+          margin-bottom: 0.3rem;
+        }
+      }
+
+      // Warning for slides with overflow
+      &.content-overflow-warning {
+        border: 2px solid rgba(239, 68, 68, 0.3);
+
+        &::after {
+          content: '\26A0 Content too large';
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(239, 68, 68, 0.9);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.7em;
+          font-weight: 600;
+          z-index: 1000;
+        }
+      }
+
+      // Two columns layout
+      &.two-columns {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 3rem !important;
+        align-items: start !important;
+
+        > h2,
+        > h3,
+        > h4 {
+          grid-column: 1 / -1 !important;
+          margin-bottom: 1rem !important;
+        }
+
+        // Force direct children to be grid items
+        > p,
+        > ul,
+        > ol,
+        > div {
+          margin: 0 !important;
+          grid-column: auto !important;
+        }
+
+        // Images inside paragraphs
+        > p > img,
+        > img {
+          max-width: 100% !important;
+          margin: 0 !important;
+          display: block !important;
+        }
+
+        // Lists
+        > ul,
+        > ol {
+          align-self: start !important;
+          padding-left: 1.5rem !important;
+        }
+      }
+    }
+  }
+
+  // Code block with numbered badge
+  .code-badge {
+    position: relative;
+
+    pre {
+      margin-top: 0;
+    }
+
+    &::before {
+      content: attr(data-badge);
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      background: $gradient-primary;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9em;
+      z-index: 10;
+      box-shadow: $shadow-md;
+    }
+  }
+
+  // Two columns utility class (can be used in HTML within slides)
+  .two-col-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 3rem !important;
+    align-items: start !important;
+
+    > div {
+      margin: 0 !important;
+    }
+
+    ul {
+      padding-left: 1.5rem !important;
+      margin: 0 !important;
+    }
+
+    img {
+      max-width: 100% !important;
+      margin: 0 !important;
+    }
+  }
+
+  // Progress bar
+  .progress {
+    height: 4px;
+    background: $gradient-primary;
+  }
+
+  // Controls - keep on right side (default)
+  .controls {
+    button {
+      color: $brand-primary !important;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+
+  // Slide number - moved to left side to avoid overlap with controls
+  .slide-number {
+    left: 16px;
+    right: auto;
+    background: rgba($brand-primary, 0.9);
+    color: white;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-md;
+    font-weight: 600;
+  }
+
+  // Fragment animations
+  .fragment {
+    &.highlight-current-blue.current-fragment {
+      color: $brand-primary;
+    }
+  }
+}

@@ -1,0 +1,69 @@
+/**
+ * Mermaid Diagram Styles
+ * Shared styles for Mermaid diagrams in documents and presentations
+ */
+
+@use './variables' as *;
+
+// Diagram container
+.mermaid-diagram {
+  margin: $spacing-md 0;
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+  border: 1px solid $border-color;
+  text-align: center;
+  overflow-x: auto;
+
+  // Make SVG responsive
+  svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+// SVG wrapper for presentations
+.mermaid-svg-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+// Error states
+.mermaid-error {
+  border-color: $brand-danger;
+  background: rgba($brand-danger, 0.05);
+}
+
+.mermaid-error-message {
+  color: $brand-danger;
+  background: rgba($brand-danger, 0.1);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  margin-top: $spacing-sm;
+  font-family: $font-family-mono;
+  font-size: 0.875rem;
+  border: 1px solid $brand-danger;
+}
+
+// Print styles for mermaid diagrams
+@media print {
+  .mermaid-diagram {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    background: #ffffff;
+    border-color: #dee2e6;
+
+    svg {
+      max-height: 400px;
+    }
+  }
+}

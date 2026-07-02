@@ -1,0 +1,54 @@
+---
+/**
+ * RevealPresentation.astro
+ * Renders all slide markdown content into a single Reveal.js section.
+ * Sorts slides by numeric prefix and converts image paths.
+ */
+
+import type { SlideCollection } from '../content/domain/slide.model';
+import { prepareSlideMarkdown } from '../content/domain/slide.service';
+
+interface Props {
+  /** Slide collection containing all slides for this deck */
+  slides: SlideCollection;
+  /** Optional Reveal.js config overrides */
+  config?: Record<string, unknown>;
+  /** Deck path used for image resolution (e.g., "ddd/session-1") */
+  deckPath: string;
+}
+
+const { slides, config = {}, deckPath } = Astro.props;
+
+// Get raw markdown from the slide collection
+const rawMarkdown = slides.toMarkdown();
+
+// Apply exercise links and image path conversion
+const allMarkdown = prepareSlideMarkdown(rawMarkdown, deckPath);
+
+// Serialize config for client-side use
+const configJson = JSON.stringify(config);
+---
+
+<section data-markdown data-separator="^---$" data-separator-vertical="^--$" data-separator-notes="^Note:">
+  <textarea data-template set:html={allMarkdown}></textarea>
+</section>
+
+<script define:vars={{ configJson }}>
+  // Store config for use in the client script
+  window.__REVEAL_CONFIG__ = JSON.parse(configJson);
+</script>
+
+<script>
+  import { initRevealPresentation } from '../reveal/infrastructure/init';
+
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', async () => {
+    const config = (window as any).__REVEAL_CONFIG__ || {};
+
+    try {
+      await initRevealPresentation(config);
+    } catch (error) {
+      console.error('Failed to initialize presentation:', error);
+    }
+  });
+</script>

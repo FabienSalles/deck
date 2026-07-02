@@ -1,0 +1,253 @@
+---
+/**
+ * Individual correction page.
+ * URL: /{deck}/{session}/corrections/{num}
+ *
+ * Displays a single correction with navigation.
+ */
+
+import path from 'node:path';
+import config from 'virtual:deck/config';
+import DocumentLayout from '../../../layouts/DocumentLayout.astro';
+import DocumentRenderer from '../../../components/DocumentRenderer.astro';
+import {
+  loadDeckMeta,
+  findDeckPathsWithSubfolder,
+  loadExerciseData,
+} from '../../../content/infrastructure/content-loader';
+import type { DeckMeta, ExerciseData } from '../../../content/domain/slide.model';
+
+interface PathData {
+  params: { path: string; num: string };
+  props: {
+    correction: ExerciseData;
+    meta: DeckMeta;
+    deckPath: string;
+    total: number;
+    prevNum: string | null;
+    nextNum: string | null;
+  };
+}
+
+export async function getStaticPaths(): Promise<PathData[]> {
+  const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
+  const deckPaths = findDeckPathsWithSubfolder(contentDir, 'corrections');
+  const paths: PathData[] = [];
+
+  for (const deckPath of deckPaths) {
+    const meta = loadDeckMeta(contentDir, deckPath);
+    const corrections = loadExerciseData(contentDir, deckPath, 'corrections');
+
+    if (corrections.length === 0) {
+      continue;
+    }
+
+    corrections.forEach((correction, index) => {
+      const prevNum = index > 0 ? corrections[index - 1].num : null;
+      const nextNum = index < corrections.length - 1 ? corrections[index + 1].num : null;
+
+      paths.push({
+        params: { path: deckPath, num: correction.num },
+        props: {
+          correction,
+          meta,
+          deckPath,
+          total: corrections.length,
+          prevNum,
+          nextNum,
+        },
+      });
+    });
+  }
+
+  return paths;
+}
+
+const { num } = Astro.params;
+const { correction, meta, deckPath, total, prevNum, nextNum } = Astro.props;
+const currentIndex = parseInt(num || '1', 10);
+---
+
+<DocumentLayout
+  title={`Correction ${num}`}
+  deckTitle={meta.title}
+  type="corrections"
+>
+  <nav class="exercise-nav">
+    <a href={`/${deckPath}/corrections`} class="nav-back">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Corrections menu
+    </a>
+    <span class="nav-position">Correction {currentIndex}/{total}</span>
+    <div class="nav-arrows">
+      {prevNum ? (
+        <a href={`/${deckPath}/corrections/${prevNum}`} class="nav-arrow" title="Previous correction">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </a>
+      ) : (
+        <span class="nav-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </span>
+      )}
+      {nextNum ? (
+        <a href={`/${deckPath}/corrections/${nextNum}`} class="nav-arrow" title="Next correction">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+      ) : (
+        <span class="nav-arrow disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </span>
+      )}
+    </div>
+  </nav>
+
+  <section class="exercise-content">
+    <DocumentRenderer
+      content={correction.content}
+      deckPath={deckPath!}
+      type="corrections"
+    />
+  </section>
+
+  <div class="exercise-footer-nav">
+    <a href={`/${deckPath}/exercices/${num}`} class="back-to-exercise-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Back to exercise
+    </a>
+    {nextNum && (
+      <a href={`/${deckPath}/corrections/${nextNum}`} class="next-exercise-btn">
+        Next correction
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </a>
+    )}
+  </div>
+</DocumentLayout>
+
+<style>
+  .exercise-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #f8f9fa);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary, #2563eb);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .nav-back:hover {
+    text-decoration: underline;
+  }
+
+  .nav-position {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+
+  .nav-arrows {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--color-surface-hover, #e5e7eb);
+    color: var(--color-text, #1f2937);
+    transition: background-color 0.2s;
+  }
+
+  .nav-arrow:hover:not(.disabled) {
+    background: var(--color-primary, #2563eb);
+    color: white;
+  }
+
+  .nav-arrow.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .exercise-content {
+    min-height: 300px;
+  }
+
+  .exercise-footer-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .back-to-exercise-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    color: var(--color-success, #16a34a);
+    border: 2px solid var(--color-success, #16a34a);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .back-to-exercise-btn:hover {
+    background: var(--color-success, #16a34a);
+    color: white;
+  }
+
+  .next-exercise-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-success, #16a34a);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .next-exercise-btn:hover {
+    background: var(--color-success-dark, #15803d);
+  }
+
+  @media print {
+    .exercise-nav,
+    .exercise-footer-nav {
+      display: none;
+    }
+  }
+</style>
