@@ -12,6 +12,7 @@
  */
 
 import type { AstroIntegration } from 'astro';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { resolveConfig, type DeckConfig } from './config';
 import { virtualDeckConfig } from './virtual-modules';
 import { fileURLToPath } from 'node:url';
@@ -72,9 +73,31 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
         }
 
         // -- Vite plugins --
+        // Slide markdown resolves images to `/<contentBase>/<deck>/_images/…`,
+        // so the package that mints those URLs also has to ship the files.
+        const imagesRoot = `src/content/${config.contentBase}`;
+
         updateConfig({
+          image: {
+            service: { entrypoint: 'astro/assets/services/noop' },
+          },
           vite: {
-            plugins: [virtualDeckConfig(config)],
+            plugins: [
+              virtualDeckConfig(config),
+              viteStaticCopy({
+                targets: [
+                  {
+                    src: `${imagesRoot}/**/_images/**/*`,
+                    dest: config.contentBase,
+                    rename: (_name: string, _ext: string, srcPath: string) => {
+                      const suffix = srcPath.split(`${imagesRoot}/`)[1];
+
+                      return suffix ?? srcPath;
+                    },
+                  },
+                ],
+              }),
+            ],
           },
         });
       },
