@@ -3,6 +3,7 @@
 // Consumers replace this file through `deck({ styles: { presentation } })`.
 // Their copy can configure the variables, drop a @use, add their own, or
 // change the order, since order decides which rule wins.
+@use './global';
 @use './custom-theme';
 @use './code-theme';
 @use './mermaid-responsive';
