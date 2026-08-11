@@ -153,15 +153,37 @@ describe('Slide Service - Deck path extraction', () => {
       expect(result).toBe('ddd/jour-1');
     });
 
-    it('should extract deck path from an ID without /slides/ folder', () => {
-      // GIVEN a slide ID without /slides/
-      const slideId = 'git/day-2/01-intro';
+    it('should return null for an exercise file', () => {
+      // GIVEN a markdown file living in an exercices folder
+      const slideId = 'ddd/jour-1/exercices/01-supple-design';
 
       // WHEN extracting the deck path
       const result = extractDeckPath(slideId);
 
-      // THEN it returns all but the last segment
-      expect(result).toBe('git/day-2');
+      // THEN it belongs to no deck
+      expect(result).toBeNull();
+    });
+
+    it('should return null for a correction file', () => {
+      // GIVEN a markdown file living in a corrections folder
+      const slideId = 'ddd/jour-1/corrections/01-supple-design';
+
+      // WHEN extracting the deck path
+      const result = extractDeckPath(slideId);
+
+      // THEN it belongs to no deck
+      expect(result).toBeNull();
+    });
+
+    it('should return null for a loose note at the collection root', () => {
+      // GIVEN a stray markdown file outside any slides folder
+      const slideId = 'ddd/qcm-jour-2';
+
+      // WHEN extracting the deck path
+      const result = extractDeckPath(slideId);
+
+      // THEN it belongs to no deck
+      expect(result).toBeNull();
     });
 
     it('should return null for short paths that cannot be split', () => {
