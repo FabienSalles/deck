@@ -1,6 +1,14 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 
+import 'reveal.js/dist/reveal.css';
+import '../styles/custom-theme.scss';
+import '../styles/code-theme.scss';
+import '../styles/mermaid-responsive.scss';
+import '../styles/exercise-menu.scss';
+import '../styles/print.scss';
+import 'reveal.js/css/print/pdf.scss';
+
 interface Props {
   title: string;
   description?: string;
@@ -16,10 +24,3 @@ const { title, description = '' } = Astro.props;
     </div>
   </div>
 </BaseLayout>
-
-<style is:global>
-  @import '../styles/custom-theme.scss';
-  @import '../styles/code-theme.scss';
-  @import '../styles/mermaid-responsive.scss';
-  @import '../styles/print.scss';
-</style>
