@@ -11,7 +11,7 @@ import { loadDeckMeta, hasContent } from '../content/infrastructure/content-load
 import { groupSlidesByDeck } from '../content/domain/slide.service';
 import { formatDayName } from '../content/domain/slide.model';
 import type { DeckMeta, DeckDay, DeckGroup } from '../content/domain/slide.model';
-import '../styles/home.scss';
+import 'virtual:deck/styles/home';
 
 const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
 

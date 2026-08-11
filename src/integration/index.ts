@@ -106,4 +106,4 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
 }
 
 // Re-export types
-export type { DeckConfig } from './config';
+export type { DeckConfig, DeckStyles } from './config';

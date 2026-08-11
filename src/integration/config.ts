@@ -38,6 +38,31 @@ export type DeckConfig = {
    * Custom Reveal.js configuration overrides.
    */
   readonly reveal?: Readonly<Record<string, unknown>>;
+
+  /**
+   * Stylesheets providing the theme, as project-root paths. Each one replaces
+   * the package entry point of the same name, so a consumer copy can configure
+   * the Sass variables, reorder the `@use` rules, drop one or add its own.
+   */
+  readonly styles?: DeckStyles;
+};
+
+export type DeckStyles = {
+  readonly presentation?: string;
+  readonly document?: string;
+  readonly home?: string;
+};
+
+export const STYLE_SLOTS = ['presentation', 'document', 'home'] as const;
+
+export type StyleSlot = (typeof STYLE_SLOTS)[number];
+
+function packageEntry(slot: StyleSlot): string {
+  return `@conveycode/deck/styles/theme-${slot}.scss`;
+}
+
+export type ResolvedDeckConfig = Omit<Required<DeckConfig>, 'styles'> & {
+  readonly styles: Required<DeckStyles>;
 };
 
 export const DEFAULT_CONFIG = {
@@ -47,12 +72,17 @@ export const DEFAULT_CONFIG = {
   corrections: true,
   homePage: true,
   reveal: {},
+  styles: {
+    presentation: packageEntry('presentation'),
+    document: packageEntry('document'),
+    home: packageEntry('home'),
+  },
 } as const satisfies Required<DeckConfig>;
 
 /**
  * Resolves user config with defaults.
  */
-export function resolveConfig(userConfig: DeckConfig = {}): Required<DeckConfig> {
+export function resolveConfig(userConfig: DeckConfig = {}): ResolvedDeckConfig {
   return {
     collection: userConfig.collection ?? DEFAULT_CONFIG.collection,
     contentBase: userConfig.contentBase ?? DEFAULT_CONFIG.contentBase,
@@ -60,5 +90,8 @@ export function resolveConfig(userConfig: DeckConfig = {}): Required<DeckConfig>
     corrections: userConfig.corrections ?? DEFAULT_CONFIG.corrections,
     homePage: userConfig.homePage ?? DEFAULT_CONFIG.homePage,
     reveal: { ...DEFAULT_CONFIG.reveal, ...userConfig.reveal },
+    styles: Object.fromEntries(
+      STYLE_SLOTS.map((slot) => [slot, userConfig.styles?.[slot] ?? packageEntry(slot)]),
+    ) as Required<DeckStyles>,
   };
 }

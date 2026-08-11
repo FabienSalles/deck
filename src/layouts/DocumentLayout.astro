@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import 'virtual:deck/styles/document';
 
 interface Props {
   title: string;
@@ -45,11 +46,6 @@ const typeLabel = type === 'exercices' ? 'Exercises' : 'Corrections';
     </footer>
   </div>
 </BaseLayout>
-
-<style is:global>
-  @import '../styles/document.scss';
-  @import '../styles/document-print.scss';
-</style>
 
 <script>
   // Mermaid diagram rendering for documents.
