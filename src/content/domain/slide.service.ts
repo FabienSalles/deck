@@ -53,8 +53,9 @@ export function convertExerciseLinks(markdown: string, basePath: string): string
 export function prepareSlideMarkdown(
   rawMarkdown: string,
   deckPath: string,
+  contentBase = 'decks',
 ): string {
-  const imagesPrefix = `/decks/${deckPath}/_images`;
+  const imagesPrefix = `/${contentBase}/${deckPath}/_images`;
   const withExerciseLinks = convertExerciseLinks(rawMarkdown, deckPath);
 
   return convertImagePaths(withExerciseLinks, imagesPrefix);
