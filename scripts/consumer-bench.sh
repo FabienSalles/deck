@@ -21,6 +21,17 @@ migrate_to_package() {
   rm -rf "$BENCH_DIR/src/lib" "$BENCH_DIR/src/pages" \
     "$BENCH_DIR/scripts/pdf-export" "$BENCH_DIR/tests/behaviors"
 
+  # A theme slot replaces the package entry point wholesale. Pointing a slot at a
+  # bare formation sheet therefore drops the package's structural rules — the ones
+  # constraining a slide to the configured height — and auto-resize stops detecting
+  # anything. Each entry pulls the package entry first, then formation's own.
+  for slot in presentation:custom-theme document:document home:home; do
+    cat > "$BENCH_DIR/src/styles/deck-${slot%%:*}.scss" <<EOF
+@use '@conveycode/deck/styles/theme-${slot%%:*}.scss';
+@use '${slot##*:}';
+EOF
+  done
+
   cat > "$BENCH_DIR/astro.config.mjs" <<'EOF'
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
@@ -36,9 +47,9 @@ export default defineConfig({
       contentBase: 'formations',
       collection: 'formations',
       styles: {
-        presentation: 'src/styles/custom-theme.scss',
-        document: 'src/styles/document.scss',
-        home: 'src/styles/home.scss',
+        presentation: 'src/styles/deck-presentation.scss',
+        document: 'src/styles/deck-document.scss',
+        home: 'src/styles/deck-home.scss',
       },
     }),
   ],
