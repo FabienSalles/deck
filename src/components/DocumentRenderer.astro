@@ -6,6 +6,7 @@
  */
 
 import { marked } from 'marked';
+import deckConfig from 'virtual:deck/config';
 
 interface Props {
   /** Raw markdown content to render */
@@ -20,10 +21,10 @@ const { content, deckPath, type } = Astro.props;
 
 /**
  * Transform image paths from relative to public paths.
- * Uses /decks/{path}/_images/ prefix instead of /@fs/ to avoid the dev-only path bug.
+ * Uses /{contentBase}/{path}/_images/ instead of /@fs/ to avoid the dev-only path bug.
  */
 function transformImagePaths(markdown: string, basePath: string): string {
-  const imagesBase = `/decks/${basePath}/_images`;
+  const imagesBase = `/${deckConfig.contentBase}/${basePath}/_images`;
 
   return markdown.replace(
     /!\[([^\]]*)\]\((?!http)([^)]+)\)/g,
