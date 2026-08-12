@@ -12,3 +12,7 @@ e2e/.astro/
 e2e/dist/
 e2e/test-results/
 e2e/playwright-report/
+
+# Claude Code workspace
+.claude/plans/
+.claude/goal-runs/
