@@ -109,8 +109,21 @@ setup() {
   (cd "$BENCH_DIR" && npm run build)
 
   mkdir -p "$BENCH_DIR/.bench"
+  # Formation's own engine derived a deck from any markdown in the collection, so
+  # loose notes sitting at a formation's root published a phantom deck page. The
+  # package drops those on purpose, so they must not count as routes lost.
   (cd "$BENCH_DIR/dist" && find . -name index.html | sed 's#^\./##' | sort) \
-    > "$BENCH_DIR/.bench/routes-before.txt"
+    | while IFS= read -r route; do
+        segment=${route%%/*}
+
+        if [ "$route" = "$segment/index.html" ] \
+          && [ ! -d "$BENCH_DIR/src/content/formations/$segment/slides" ] \
+          && [ -d "$BENCH_DIR/src/content/formations/$segment" ]; then
+          continue
+        fi
+
+        printf '%s\n' "$route"
+      done > "$BENCH_DIR/.bench/routes-before.txt"
 
   pack_and_install_deck
   migrate_to_package
