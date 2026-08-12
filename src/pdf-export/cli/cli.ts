@@ -52,7 +52,7 @@ export function createCli(): Command {
     .description('Export all decks')
     .action(async () => {
       const summary = await runExport(program, 'all');
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export specific deck slides
@@ -61,7 +61,7 @@ export function createCli(): Command {
     .description('Export a specific deck (e.g., ddd/session-1)')
     .action(async (path: string) => {
       const summary = await runExport(program, 'slides', { path });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export single exercise
@@ -70,7 +70,7 @@ export function createCli(): Command {
     .description('Export a single exercise (e.g., ddd/session-1 01)')
     .action(async (deck: string, num: string) => {
       const summary = await runExport(program, 'exercise', { deck, num });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export single correction
@@ -79,16 +79,32 @@ export function createCli(): Command {
     .description('Export a single correction (e.g., ddd/session-1 01)')
     .action(async (deck: string, num: string) => {
       const summary = await runExport(program, 'correction', { deck, num });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Default command (export all)
   program.action(async () => {
     const summary = await runExport(program, 'all');
-    process.exit(summary.failed > 0 ? 1 : 0);
+    process.exit(exitCode(summary));
   });
 
   return program;
+}
+
+// An export that found nothing to do is a misconfiguration, not a success: the
+// content directory must match the integration's `contentBase`, and a silent
+// zero would let a pipeline publish an empty release.
+function exitCode(summary: ExportSummary): number {
+  if (summary.total === 0) {
+    process.stderr.write(
+      'No deck found. Point --content-dir at the collection the integration renders ' +
+        "(its `contentBase`, 'src/content/decks' by default).\n",
+    );
+
+    return 1;
+  }
+
+  return summary.failed > 0 ? 1 : 0;
 }
 
 /**
