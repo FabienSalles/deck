@@ -137,6 +137,31 @@ describe('Slide Service - Full markdown pipeline', () => {
       // AND image paths are converted to absolute
       expect(result).toContain('/decks/ddd/jour-1/_images/arch.png');
     });
+
+    it('should resolve images against a renamed content collection', () => {
+      // GIVEN a consumer that renamed the collection, as formation does
+      const rawMarkdown = '![branch](../_images/branch_1.png)';
+      const deckPath = 'git/day-1';
+
+      // WHEN preparing markdown with that content base
+      const result = prepareSlideMarkdown(rawMarkdown, deckPath, 'formations');
+
+      // THEN the image URL follows the collection the files were copied under
+      expect(result).toContain('/formations/git/day-1/_images/branch_1.png');
+      // AND never falls back to the default collection name
+      expect(result).not.toContain('/decks/');
+    });
+
+    it('should keep the default collection when the consumer renamed nothing', () => {
+      // GIVEN a consumer leaving the collection at its default
+      const rawMarkdown = '![diagram](_images/arch.png)';
+
+      // WHEN preparing markdown without naming a content base
+      const result = prepareSlideMarkdown(rawMarkdown, 'ddd/jour-1');
+
+      // THEN the default collection is used
+      expect(result).toContain('/decks/ddd/jour-1/_images/arch.png');
+    });
   });
 });
 
