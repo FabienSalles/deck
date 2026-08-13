@@ -61,6 +61,7 @@
     "@types/node": "^22.0.0",
     "astro": "^5.1.0",
     "mermaid": "^11.13.0",
+    "pngjs": "^7.0.0",
     "sass": "^1.83.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
