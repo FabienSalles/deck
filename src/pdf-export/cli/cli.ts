@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 
+import { resolveContentDir } from '../../integration/manifest.js';
 import { createConfig } from '../core/ExportConfig.js';
 import { ExportOrchestrator, type ExportSummary } from '../core/ExportOrchestrator.js';
 import { DeckScanner } from '../core/DeckScanner.js';
@@ -43,7 +44,7 @@ export function createCli(): Command {
     .option('-v, --verbose', 'Enable verbose logging')
     .option('--base-url <url>', 'Base URL of the server', 'http://localhost:4321')
     .option('--output-dir <dir>', 'Output directory for PDFs', 'public/pdf')
-    .option('--content-dir <dir>', 'Content directory', 'src/content/decks')
+    .option('--content-dir <dir>', "Content directory (default: the integration's contentBase)")
     .option('--concurrency <n>', 'Max concurrent exports', '3');
 
   // Export all decks
@@ -97,8 +98,8 @@ export function createCli(): Command {
 function exitCode(summary: ExportSummary): number {
   if (summary.total === 0) {
     process.stderr.write(
-      'No deck found. Point --content-dir at the collection the integration renders ' +
-        "(its `contentBase`, 'src/content/decks' by default).\n",
+      'No deck found. Build the site once so the integration writes .deck/config.json, ' +
+        'or point --content-dir at the collection it renders.\n',
     );
 
     return 1;
@@ -119,7 +120,7 @@ async function runExport(
     verbose?: boolean;
     baseUrl: string;
     outputDir: string;
-    contentDir: string;
+    contentDir?: string;
     concurrency: string;
   }>();
 
@@ -127,7 +128,7 @@ async function runExport(
   const config = createConfig({
     baseUrl: opts.baseUrl,
     outputDir: opts.outputDir,
-    contentDir: opts.contentDir,
+    contentDir: resolveContentDir(process.cwd(), opts.contentDir),
     maxConcurrentDecks: parseInt(opts.concurrency, 10),
   });
 

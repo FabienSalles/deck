@@ -13,7 +13,8 @@
 
 import type { AstroIntegration } from 'astro';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { resolveConfig, type DeckConfig } from './config';
+import { contentDirOf, resolveConfig, type DeckConfig } from './config';
+import { writeDeckManifest } from './manifest';
 import { virtualDeckConfig } from './virtual-modules';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -75,7 +76,7 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
         // -- Vite plugins --
         // Slide markdown resolves images to `/<contentBase>/<deck>/_images/…`,
         // so the package that mints those URLs also has to ship the files.
-        const imagesRoot = `src/content/${config.contentBase}`;
+        const imagesRoot = contentDirOf(config);
 
         updateConfig({
           image: {
@@ -100,6 +101,10 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
             ],
           },
         });
+      },
+
+      'astro:config:done': ({ config: astroConfig }) => {
+        writeDeckManifest(fileURLToPath(astroConfig.root), config);
       },
     },
   };

@@ -65,6 +65,10 @@ export type ResolvedDeckConfig = Omit<Required<DeckConfig>, 'styles'> & {
   readonly styles: Required<DeckStyles>;
 };
 
+export function contentDirOf(config: Pick<ResolvedDeckConfig, 'contentBase'>): string {
+  return `src/content/${config.contentBase}`;
+}
+
 export const DEFAULT_CONFIG = {
   collection: 'decks',
   contentBase: 'decks',
