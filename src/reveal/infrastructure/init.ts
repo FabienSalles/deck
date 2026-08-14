@@ -16,7 +16,7 @@ import Zoom from 'reveal.js/plugin/zoom/zoom.esm.js';
 // Custom plugins
 import { PreHighlightPlugin } from './plugins/pre-highlight';
 import { AutoResizePlugin } from './plugins/auto-resize';
-import { MermaidPlugin } from './plugins/mermaid';
+import { firstMermaidPass, MermaidPlugin } from './plugins/mermaid';
 
 // Services
 import { isPrintMode } from './services/PrintModeService';
@@ -142,6 +142,10 @@ export async function initRevealPresentation(
   await deck.initialize();
 
   deck.sync();
+
+  if (isPrint) {
+    await firstMermaidPass;
+  }
 
   // Expose Reveal globally for tools like Decktape
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

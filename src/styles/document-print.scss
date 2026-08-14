@@ -39,6 +39,12 @@
   }
 
   // Document page container - MUST use !important to override document.scss
+  //
+  // Every selector below is nested under .document-page rather than declared at
+  // the top level. A consumer layering its own copy of document.scss on top of
+  // this theme (same selectors, no @media) has equal specificity and would win
+  // on source order alone; nesting under .document-page keeps these print rules
+  // ahead on specificity instead, regardless of what comes after in the cascade.
   .document-page {
     min-height: auto !important;
     height: auto !important;
@@ -86,171 +92,171 @@
     .document-footer {
       display: none !important;
     }
-  }
 
-  // Main content - clean typography for print
-  .document-content {
-    max-width: 100%;
-    padding: 0;
+    // Main content - clean typography for print
+    .document-content {
+      max-width: 100%;
+      padding: 0;
 
-    // Typography optimized for print
-    h1 {
-      font-size: 16pt;
-      margin-top: 6mm;
-      margin-bottom: 3mm;
-      border-bottom: none;
-      page-break-after: avoid;
-    }
+      // Typography optimized for print
+      h1 {
+        font-size: 16pt;
+        margin-top: 6mm;
+        margin-bottom: 3mm;
+        border-bottom: none;
+        page-break-after: avoid;
+      }
 
-    h2 {
-      font-size: 14pt;
-      margin-top: 5mm;
-      margin-bottom: 2mm;
-      color: #000;
-      page-break-after: avoid;
-    }
+      h2 {
+        font-size: 14pt;
+        margin-top: 5mm;
+        margin-bottom: 2mm;
+        color: #000;
+        page-break-after: avoid;
+      }
 
-    h3 {
-      font-size: 12pt;
-      margin-top: 4mm;
-      margin-bottom: 2mm;
-      page-break-after: avoid;
-    }
+      h3 {
+        font-size: 12pt;
+        margin-top: 4mm;
+        margin-bottom: 2mm;
+        page-break-after: avoid;
+      }
 
-    h4,
-    h5,
-    h6 {
-      font-size: 11pt;
-      margin-top: 3mm;
-      margin-bottom: 2mm;
-      page-break-after: avoid;
-    }
+      h4,
+      h5,
+      h6 {
+        font-size: 11pt;
+        margin-top: 3mm;
+        margin-bottom: 2mm;
+        page-break-after: avoid;
+      }
 
-    p {
-      font-size: 11pt;
-      line-height: 1.5;
-      margin-bottom: 2mm;
-      orphans: 3;
-      widows: 3;
-    }
+      p {
+        font-size: 11pt;
+        line-height: 1.5;
+        margin-bottom: 2mm;
+        orphans: 3;
+        widows: 3;
+      }
 
-    // Lists
-    ul,
-    ol {
-      margin-bottom: 3mm;
-      padding-left: 8mm;
+      // Lists
+      ul,
+      ol {
+        margin-bottom: 3mm;
+        padding-left: 8mm;
 
-      li {
-        margin-bottom: 1mm;
+        li {
+          margin-bottom: 1mm;
+          page-break-inside: avoid;
+        }
+      }
+
+      // Code blocks - clean borders for print
+      pre {
+        font-size: 9pt;
+        line-height: 1.4;
+        padding: 3mm;
+        margin: 3mm 0;
+        background: #f8f8f8 !important;
+        border: 0.5pt solid #ccc;
+        border-radius: 2mm;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        page-break-inside: avoid;
+
+        code {
+          font-size: 9pt;
+          background: none;
+          padding: 0;
+        }
+      }
+
+      // Inline code
+      code {
+        font-size: 10pt;
+        padding: 0.5mm 1.5mm;
+        background: #f0f0f0;
+        border-radius: 1mm;
+      }
+
+      // Blockquotes
+      blockquote {
+        margin: 3mm 0;
+        padding: 2mm 4mm;
+        border-left: 1mm solid #666;
+        background: #f8f8f8;
+        font-style: italic;
         page-break-inside: avoid;
       }
-    }
 
-    // Code blocks - clean borders for print
-    pre {
-      font-size: 9pt;
-      line-height: 1.4;
-      padding: 3mm;
-      margin: 3mm 0;
-      background: #f8f8f8 !important;
-      border: 0.5pt solid #ccc;
-      border-radius: 2mm;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      page-break-inside: avoid;
+      // Tables
+      table {
+        width: 100%;
+        margin: 3mm 0;
+        border-collapse: collapse;
+        font-size: 10pt;
+        page-break-inside: avoid;
 
-      code {
-        font-size: 9pt;
-        background: none;
-        padding: 0;
+        th,
+        td {
+          padding: 2mm 3mm;
+          border: 0.5pt solid #333;
+          text-align: left;
+        }
+
+        th {
+          background: #f0f0f0;
+          font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+          background: #fafafa;
+        }
+      }
+
+      // Images
+      img {
+        max-width: 100%;
+        height: auto;
+        page-break-inside: avoid;
+      }
+
+      // Horizontal rules (exercise separators)
+      hr {
+        border: none;
+        border-top: 0.5pt solid #ccc;
+        margin: 6mm 0;
+        page-break-after: avoid;
+      }
+
+      // Links - don't show URLs, keep text clean
+      a {
+        color: #000;
+        text-decoration: underline;
+
+        &::after {
+          content: none !important;
+        }
       }
     }
 
-    // Inline code
-    code {
-      font-size: 10pt;
-      padding: 0.5mm 1.5mm;
-      background: #f0f0f0;
-      border-radius: 1mm;
-    }
-
-    // Blockquotes
-    blockquote {
-      margin: 3mm 0;
-      padding: 2mm 4mm;
-      border-left: 1mm solid #666;
-      background: #f8f8f8;
-      font-style: italic;
-      page-break-inside: avoid;
-    }
-
-    // Tables
-    table {
-      width: 100%;
-      margin: 3mm 0;
-      border-collapse: collapse;
-      font-size: 10pt;
+    // Exercise/Correction sections
+    .exercise-section,
+    .correction-section {
       page-break-inside: avoid;
 
-      th,
-      td {
-        padding: 2mm 3mm;
-        border: 0.5pt solid #333;
-        text-align: left;
-      }
-
-      th {
-        background: #f0f0f0;
-        font-weight: 600;
-      }
-
-      tr:nth-child(even) {
-        background: #fafafa;
+      &:not(:last-child) {
+        margin-bottom: 8mm;
       }
     }
 
-    // Images
-    img {
-      max-width: 100%;
-      height: auto;
-      page-break-inside: avoid;
-    }
-
-    // Horizontal rules (exercise separators)
-    hr {
+    // Exercise separator - page break friendly
+    .exercise-separator,
+    .correction-separator {
       border: none;
-      border-top: 0.5pt solid #ccc;
-      margin: 6mm 0;
-      page-break-after: avoid;
+      border-top: 0.5pt dashed #999;
+      margin: 8mm 0;
     }
-
-    // Links - don't show URLs, keep text clean
-    a {
-      color: #000;
-      text-decoration: underline;
-
-      &::after {
-        content: none !important;
-      }
-    }
-  }
-
-  // Exercise/Correction sections
-  .exercise-section,
-  .correction-section {
-    page-break-inside: avoid;
-
-    &:not(:last-child) {
-      margin-bottom: 8mm;
-    }
-  }
-
-  // Exercise separator - page break friendly
-  .exercise-separator,
-  .correction-separator {
-    border: none;
-    border-top: 0.5pt dashed #999;
-    margin: 8mm 0;
   }
 }
 

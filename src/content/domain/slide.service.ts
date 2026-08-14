@@ -53,8 +53,9 @@ export function convertExerciseLinks(markdown: string, basePath: string): string
 export function prepareSlideMarkdown(
   rawMarkdown: string,
   deckPath: string,
+  contentBase = 'decks',
 ): string {
-  const imagesPrefix = `/decks/${deckPath}/_images`;
+  const imagesPrefix = `/${contentBase}/${deckPath}/_images`;
   const withExerciseLinks = convertExerciseLinks(rawMarkdown, deckPath);
 
   return convertImagePaths(withExerciseLinks, imagesPrefix);
@@ -63,22 +64,23 @@ export function prepareSlideMarkdown(
 /**
  * Extracts the deck path from a slide ID.
  *
+ * A deck is a folder holding a `slides/` subfolder. Markdown living anywhere
+ * else — exercises, corrections, loose notes at the collection root — belongs
+ * to no deck and must not surface as one.
+ *
  * `ddd/jour-1/slides/01-intro` → `ddd/jour-1`
- * `git/day-2/01-intro` → `git/day-2`
+ * `ddd/jour-1/exercices/01-supple-design` → null
+ * `ddd/qcm-jour-2` → null
  */
 export function extractDeckPath(slideId: string): string | null {
   const parts = slideId.split('/');
   const slidesIndex = parts.indexOf('slides');
 
-  if (slidesIndex > 0) {
-    return parts.slice(0, slidesIndex).join('/');
+  if (slidesIndex <= 0) {
+    return null;
   }
 
-  if (parts.length >= 2) {
-    return parts.slice(0, -1).join('/');
-  }
-
-  return null;
+  return parts.slice(0, slidesIndex).join('/');
 }
 
 /**

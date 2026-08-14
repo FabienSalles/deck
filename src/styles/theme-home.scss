@@ -1,0 +1,4 @@
+// Theme entry point for the home page.
+// Replaced through `deck({ styles: { home } })`.
+@use './global';
+@use './home';

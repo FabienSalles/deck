@@ -1,0 +1,6 @@
+// Theme entry point for exercise and correction pages, menus included.
+// Replaced through `deck({ styles: { document } })`.
+@use './global';
+@use './document';
+@use './document-print';
+@use './exercise-menu';

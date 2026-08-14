@@ -77,7 +77,7 @@ export class DefaultMermaidRenderer implements MermaidRenderer {
     if (isPrintMode) {
       container.style.cssText = `
         display: flex; justify-content: center; align-items: center;
-        padding: 1rem; background: #ffffff; border: 1px solid #dee2e6;
+        padding: 1rem; background: var(--mermaid-bg, #ffffff); border: 1px solid #dee2e6;
         border-radius: 0.75rem; margin: 1rem auto; max-width: 90%;
         width: fit-content; overflow: visible;
         page-break-inside: avoid; break-inside: avoid;
@@ -85,7 +85,7 @@ export class DefaultMermaidRenderer implements MermaidRenderer {
     } else {
       container.style.cssText = `
         display: flex; justify-content: center; align-items: center;
-        padding: 1rem; background: var(--bg-secondary);
+        padding: 1rem; background: var(--mermaid-bg, var(--bg-secondary));
         border-radius: 0.75rem; margin: 1rem auto;
         max-width: 95%; max-height: ${maxHeight}; overflow: hidden;
       `;

@@ -7,6 +7,7 @@
 
 import type { SlideCollection } from '../content/domain/slide.model';
 import { prepareSlideMarkdown } from '../content/domain/slide.service';
+import deckConfig from 'virtual:deck/config';
 
 interface Props {
   /** Slide collection containing all slides for this deck */
@@ -23,7 +24,7 @@ const { slides, config = {}, deckPath } = Astro.props;
 const rawMarkdown = slides.toMarkdown();
 
 // Apply exercise links and image path conversion
-const allMarkdown = prepareSlideMarkdown(rawMarkdown, deckPath);
+const allMarkdown = prepareSlideMarkdown(rawMarkdown, deckPath, deckConfig.contentBase);
 
 // Serialize config for client-side use
 const configJson = JSON.stringify(config);

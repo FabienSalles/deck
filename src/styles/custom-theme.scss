@@ -426,16 +426,29 @@
         justify-content: center;
       }
 
+      // The full-bleed backdrop belongs to Reveal's background layer
+      // (`data-background-gradient`); painting it here would only cover the
+      // slide box and leave the page margins white.
       &.title-slide {
         text-align: center;
-        background: $gradient-primary;
+      }
+
+      // White type is tied to an actual Reveal background: applying it to a
+      // bare `.title-slide` would render white-on-white.
+      &.title-slide[data-background-gradient],
+      &.title-slide[data-background-color],
+      &.title-slide[data-background-image] {
         color: white;
 
         h1,
         h2,
         h3 {
           color: white;
+          background: none;
+          -webkit-background-clip: unset;
+          background-clip: unset;
           -webkit-text-fill-color: white;
+          border-bottom-color: rgba(255, 255, 255, 0.5);
         }
       }
 

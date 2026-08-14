@@ -13,7 +13,7 @@
  *   -v, --verbose           Enable verbose logging
  *   --base-url <url>        Base URL of the server
  *   --output-dir <dir>      Output directory for PDFs
- *   --content-dir <dir>     Content directory
+ *   --content-dir <dir>     Content directory (default: the integration's contentBase)
  *   --concurrency <n>       Max concurrent exports
  */
 

@@ -13,7 +13,7 @@ import {
   loadExerciseInfos,
 } from '../../../content/infrastructure/content-loader';
 import type { DeckMeta, ExerciseInfo } from '../../../content/domain/slide.model';
-import '../../../styles/exercise-menu.scss';
+import 'virtual:deck/styles/document';
 
 export async function getStaticPaths() {
   const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);

@@ -2,6 +2,9 @@
  * Styles for the homepage (deck listing)
  */
 
+@use 'sass:color';
+@use './variables' as *;
+
 .home {
   max-width: 1200px;
   margin: 0 auto;
@@ -22,7 +25,7 @@
     font-weight: 700;
     color: #1a1a1a;
     margin: 0 0 0.5rem;
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    background: $gradient-primary;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -109,7 +112,7 @@
     box-shadow:
       0 4px 12px -2px rgba(0, 0, 0, 0.1),
       0 2px 6px -2px rgba(0, 0, 0, 0.05);
-    border-color: #2563eb;
+    border-color: $brand-primary;
   }
 }
 
@@ -152,35 +155,35 @@
 
   // Primary (Slides)
   &.primary {
-    background: #2563eb;
+    background: $brand-primary;
     color: white;
 
     &:hover {
-      background: #1d4ed8;
+      background: color.scale($brand-primary, $lightness: -18.75%);
     }
   }
 
   // Exercises
   &.exercices {
-    background: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: rgba($brand-primary, 0.1);
+    color: $brand-primary;
+    border: 1px solid rgba($brand-primary, 0.2);
 
     &:hover {
-      background: rgba(37, 99, 235, 0.2);
-      border-color: rgba(37, 99, 235, 0.4);
+      background: rgba($brand-primary, 0.2);
+      border-color: rgba($brand-primary, 0.4);
     }
   }
 
   // Corrections
   &.corrections {
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba($brand-success, 0.1);
     color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba($brand-success, 0.2);
 
     &:hover {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba($brand-success, 0.2);
+      border-color: rgba($brand-success, 0.4);
     }
   }
 }

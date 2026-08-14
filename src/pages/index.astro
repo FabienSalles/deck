@@ -11,7 +11,7 @@ import { loadDeckMeta, hasContent } from '../content/infrastructure/content-load
 import { groupSlidesByDeck } from '../content/domain/slide.service';
 import { formatDayName } from '../content/domain/slide.model';
 import type { DeckMeta, DeckDay, DeckGroup } from '../content/domain/slide.model';
-import '../styles/home.scss';
+import 'virtual:deck/styles/home';
 
 const contentDir = path.join(process.cwd(), 'src/content', config.contentBase);
 
@@ -72,11 +72,11 @@ const groups: DeckGroup[] = Array.from(groupsMap.entries())
   .sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<BaseLayout title="Presentations" description="Interactive technical presentations">
+<BaseLayout title={config.homeTitle} description={config.homeSubtitle}>
   <main class="home">
     <header class="header">
-      <h1>Presentations</h1>
-      <p class="subtitle">Interactive technical presentations</p>
+      <h1>{config.homeTitle}</h1>
+      <p class="subtitle">{config.homeSubtitle}</p>
     </header>
 
     {

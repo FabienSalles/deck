@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 
+import { resolveContentDir } from '../../integration/manifest.js';
 import { createConfig } from '../core/ExportConfig.js';
 import { ExportOrchestrator, type ExportSummary } from '../core/ExportOrchestrator.js';
 import { DeckScanner } from '../core/DeckScanner.js';
@@ -43,7 +44,7 @@ export function createCli(): Command {
     .option('-v, --verbose', 'Enable verbose logging')
     .option('--base-url <url>', 'Base URL of the server', 'http://localhost:4321')
     .option('--output-dir <dir>', 'Output directory for PDFs', 'public/pdf')
-    .option('--content-dir <dir>', 'Content directory', 'src/content/decks')
+    .option('--content-dir <dir>', "Content directory (default: the integration's contentBase)")
     .option('--concurrency <n>', 'Max concurrent exports', '3');
 
   // Export all decks
@@ -52,7 +53,7 @@ export function createCli(): Command {
     .description('Export all decks')
     .action(async () => {
       const summary = await runExport(program, 'all');
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export specific deck slides
@@ -61,7 +62,7 @@ export function createCli(): Command {
     .description('Export a specific deck (e.g., ddd/session-1)')
     .action(async (path: string) => {
       const summary = await runExport(program, 'slides', { path });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export single exercise
@@ -70,7 +71,7 @@ export function createCli(): Command {
     .description('Export a single exercise (e.g., ddd/session-1 01)')
     .action(async (deck: string, num: string) => {
       const summary = await runExport(program, 'exercise', { deck, num });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Export single correction
@@ -79,16 +80,32 @@ export function createCli(): Command {
     .description('Export a single correction (e.g., ddd/session-1 01)')
     .action(async (deck: string, num: string) => {
       const summary = await runExport(program, 'correction', { deck, num });
-      process.exit(summary.failed > 0 ? 1 : 0);
+      process.exit(exitCode(summary));
     });
 
   // Default command (export all)
   program.action(async () => {
     const summary = await runExport(program, 'all');
-    process.exit(summary.failed > 0 ? 1 : 0);
+    process.exit(exitCode(summary));
   });
 
   return program;
+}
+
+// An export that found nothing to do is a misconfiguration, not a success: the
+// content directory must match the integration's `contentBase`, and a silent
+// zero would let a pipeline publish an empty release.
+function exitCode(summary: ExportSummary): number {
+  if (summary.total === 0) {
+    process.stderr.write(
+      'No deck found. Build the site once so the integration writes .deck/config.json, ' +
+        'or point --content-dir at the collection it renders.\n',
+    );
+
+    return 1;
+  }
+
+  return summary.failed > 0 ? 1 : 0;
 }
 
 /**
@@ -103,7 +120,7 @@ async function runExport(
     verbose?: boolean;
     baseUrl: string;
     outputDir: string;
-    contentDir: string;
+    contentDir?: string;
     concurrency: string;
   }>();
 
@@ -111,7 +128,7 @@ async function runExport(
   const config = createConfig({
     baseUrl: opts.baseUrl,
     outputDir: opts.outputDir,
-    contentDir: opts.contentDir,
+    contentDir: resolveContentDir(process.cwd(), opts.contentDir),
     maxConcurrentDecks: parseInt(opts.concurrency, 10),
   });
 

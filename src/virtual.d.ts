@@ -9,3 +9,7 @@ declare module 'virtual:deck/config' {
   const config: Required<DeckConfig>;
   export default config;
 }
+
+declare module 'virtual:deck/styles/presentation' {}
+declare module 'virtual:deck/styles/document' {}
+declare module 'virtual:deck/styles/home' {}

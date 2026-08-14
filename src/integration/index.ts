@@ -12,7 +12,9 @@
  */
 
 import type { AstroIntegration } from 'astro';
-import { resolveConfig, type DeckConfig } from './config';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { contentDirOf, resolveConfig, type DeckConfig } from './config';
+import { writeDeckManifest } from './manifest';
 import { virtualDeckConfig } from './virtual-modules';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -72,15 +74,41 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
         }
 
         // -- Vite plugins --
+        // Slide markdown resolves images to `/<contentBase>/<deck>/_images/…`,
+        // so the package that mints those URLs also has to ship the files.
+        const imagesRoot = contentDirOf(config);
+
         updateConfig({
+          image: {
+            service: { entrypoint: 'astro/assets/services/noop' },
+          },
           vite: {
-            plugins: [virtualDeckConfig(config)],
+            plugins: [
+              virtualDeckConfig(config),
+              viteStaticCopy({
+                targets: [
+                  {
+                    src: `${imagesRoot}/**/_images/**/*`,
+                    dest: config.contentBase,
+                    rename: (_name: string, _ext: string, srcPath: string) => {
+                      const suffix = srcPath.split(`${imagesRoot}/`)[1];
+
+                      return suffix ?? srcPath;
+                    },
+                  },
+                ],
+              }),
+            ],
           },
         });
+      },
+
+      'astro:config:done': ({ config: astroConfig }) => {
+        writeDeckManifest(fileURLToPath(astroConfig.root), config);
       },
     },
   };
 }
 
 // Re-export types
-export type { DeckConfig } from './config';
+export type { DeckConfig, DeckStyles } from './config';
