@@ -40,7 +40,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/",
+    "lint": "eslint src/ scripts/ e2e/scripts/",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
@@ -57,13 +57,17 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/js-yaml": "^4.0.0",
     "@types/node": "^22.0.0",
     "astro": "^5.1.0",
+    "eslint": "^10.8.1",
+    "eslint-plugin-no-unsanitized": "^4.1.5",
     "mermaid": "^11.13.0",
     "pngjs": "^7.0.0",
     "sass": "^1.83.0",
     "typescript": "^5.7.0",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^3.0.0"
   },
   "keywords": [

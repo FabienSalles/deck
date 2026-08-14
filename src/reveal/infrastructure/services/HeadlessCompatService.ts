@@ -46,7 +46,6 @@ export function logHeadlessDebugInfo(deck: Api): void {
 
   const totalSlides = deck.getTotalSlides();
   const slides = deck.getSlides();
-  // eslint-disable-next-line no-console
   console.log(`[Reveal.js] Initialized with ${totalSlides} slides (${slides.length} sections)`);
 }
 
