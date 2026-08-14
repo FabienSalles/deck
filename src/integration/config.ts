@@ -35,6 +35,18 @@ export type DeckConfig = {
   readonly homePage?: boolean;
 
   /**
+   * Heading and document title of the home page.
+   * @default 'Presentations'
+   */
+  readonly homeTitle?: string;
+
+  /**
+   * Subtitle and meta description of the home page.
+   * @default 'Interactive technical presentations'
+   */
+  readonly homeSubtitle?: string;
+
+  /**
    * Custom Reveal.js configuration overrides.
    */
   readonly reveal?: Readonly<Record<string, unknown>>;
@@ -75,6 +87,8 @@ export const DEFAULT_CONFIG = {
   exercises: true,
   corrections: true,
   homePage: true,
+  homeTitle: 'Presentations',
+  homeSubtitle: 'Interactive technical presentations',
   reveal: {},
   styles: {
     presentation: packageEntry('presentation'),
@@ -93,6 +107,8 @@ export function resolveConfig(userConfig: DeckConfig = {}): ResolvedDeckConfig {
     exercises: userConfig.exercises ?? DEFAULT_CONFIG.exercises,
     corrections: userConfig.corrections ?? DEFAULT_CONFIG.corrections,
     homePage: userConfig.homePage ?? DEFAULT_CONFIG.homePage,
+    homeTitle: userConfig.homeTitle ?? DEFAULT_CONFIG.homeTitle,
+    homeSubtitle: userConfig.homeSubtitle ?? DEFAULT_CONFIG.homeSubtitle,
     reveal: { ...DEFAULT_CONFIG.reveal, ...userConfig.reveal },
     styles: Object.fromEntries(
       STYLE_SLOTS.map((slot) => [slot, userConfig.styles?.[slot] ?? packageEntry(slot)]),

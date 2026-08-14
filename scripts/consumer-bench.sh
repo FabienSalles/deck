@@ -79,6 +79,8 @@ export default defineConfig({
     deck({
       contentBase: 'formations',
       collection: 'formations',
+      homeTitle: 'Formations',
+      homeSubtitle: 'Presentations techniques interactives',
       styles: {
         presentation: 'src/styles/deck-presentation.scss',
         document: 'src/styles/deck-document.scss',
