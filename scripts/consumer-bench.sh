@@ -54,6 +54,17 @@ migrate_to_package() {
   rm -rf "$BENCH_DIR/src/lib" "$BENCH_DIR/src/pages" \
     "$BENCH_DIR/scripts/pdf-export" "$BENCH_DIR/tests/behaviors"
 
+  # Both point at what the deletion above just removed, so `npm test` and the
+  # type-check stay red until they follow. tests/functions is the only vitest
+  # suite the migration leaves standing.
+  (cd "$BENCH_DIR" && node -e "
+    const fs = require('node:fs');
+    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+    pkg.scripts.test = 'vitest run tests/functions';
+    fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+  ")
+  sed -i '' "/'@lib': resolve/d" "$BENCH_DIR/vitest.config.ts"
+
   # A theme slot replaces the package entry point wholesale. Pointing a slot at a
   # bare formation sheet therefore drops the package's structural rules — the ones
   # constraining a slide to the configured height — and auto-resize stops detecting
