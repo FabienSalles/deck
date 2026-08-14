@@ -10,6 +10,7 @@ const assets = [
   { src: 'src/layouts', dest: 'dist/layouts' },
   { src: 'src/pages', dest: 'dist/pages' },
   { src: 'src/styles', dest: 'dist/styles' },
+  { src: 'src/virtual.d.ts', dest: 'dist/virtual.d.ts' },
 ];
 
 for (const { src, dest } of assets) {

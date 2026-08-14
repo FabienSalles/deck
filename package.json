@@ -32,8 +32,7 @@
   },
   "files": [
     "dist/",
-    "examples/",
-    "templates/"
+    "examples/"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-imports.js && node scripts/copy-assets.js",
