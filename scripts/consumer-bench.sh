@@ -5,6 +5,39 @@ DECK_REPO="/Users/fabiensalles/projects/github/deck"
 FORMATION_REPO="/Users/fabiensalles/projects/conveycode/formation"
 BENCH_DIR="/Users/fabiensalles/orca/workspaces/formation/deck-bench"
 BENCH_BRANCH="bench/deck-consumer"
+BENCH_PORT=4321
+
+ensure_preview() {
+  local pid owner
+
+  pid=$(lsof -t -nP -iTCP:"$BENCH_PORT" -sTCP:LISTEN 2>/dev/null | head -1 || true)
+
+  if [ -n "$pid" ]; then
+    owner=$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | tail -1)
+    owner=${owner#n}
+
+    if [ "$owner" = "$BENCH_DIR" ]; then
+      return
+    fi
+
+    echo "port $BENCH_PORT is served from $owner, not the bench: an export would capture that site" >&2
+    exit 1
+  fi
+
+  (cd "$BENCH_DIR" && nohup npm run preview >/dev/null 2>&1 &)
+
+  local attempt
+  for attempt in $(seq 1 30); do
+    if curl -s -o /dev/null "http://localhost:$BENCH_PORT/"; then
+      return
+    fi
+
+    sleep 1
+  done
+
+  echo "the bench preview server never answered on port $BENCH_PORT" >&2
+  exit 1
+}
 
 pack_and_install_deck() {
   (cd "$DECK_REPO" && npm run build)
@@ -127,6 +160,7 @@ setup() {
 
   pack_and_install_deck
   migrate_to_package
+  ensure_preview
 }
 
 refresh() {
@@ -136,6 +170,7 @@ refresh() {
   fi
   pack_and_install_deck
   migrate_to_package
+  ensure_preview
 }
 
 case "${1:-}" in
