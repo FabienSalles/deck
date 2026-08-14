@@ -19,6 +19,12 @@ const defaultOptions: MermaidPluginOptions = {
   flowchart: { curve: 'basis' },
 };
 
+let settleFirstPass: () => void = () => undefined;
+
+export const firstMermaidPass = new Promise<void>((resolve) => {
+  settleFirstPass = resolve;
+});
+
 export const MermaidPlugin = (options: MermaidPluginOptions = defaultOptions): Plugin => {
   return {
     id: 'mermaid',
@@ -77,7 +83,7 @@ export const MermaidPlugin = (options: MermaidPluginOptions = defaultOptions): P
 
       deck.on('ready', () => {
         setTimeout(() => {
-          renderMermaidDiagrams();
+          renderMermaidDiagrams().finally(settleFirstPass);
         }, TIMING.MERMAID_RENDER_DELAY);
       });
 
