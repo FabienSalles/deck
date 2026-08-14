@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * @conveycode/deck -- PDF Export CLI
+ * @fabiensalles/deck -- PDF Export CLI
  *
  * Usage:
  *   deck-pdf all                          # Export all decks

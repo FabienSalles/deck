@@ -1,5 +1,5 @@
 /**
- * @conveycode/deck — Content Module
+ * @fabiensalles/deck — Content Module
  * Public API for content loading, slide management, and schema.
  */
 

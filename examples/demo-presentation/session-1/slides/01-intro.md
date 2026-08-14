@@ -1,4 +1,4 @@
-## Welcome to @conveycode/deck
+## Welcome to @fabiensalles/deck
 
 A modern presentation framework built on Reveal.js and Astro.
 
@@ -16,9 +16,9 @@ Note: This is the intro slide. Use it to set context for your audience. Speaker 
 TypeScript example with line highlights:
 
 ```typescript [1-3|5-8|10]
-import { initReveal } from '@conveycode/deck';
-import { mermaidPlugin } from '@conveycode/deck/plugins';
-import { autoResizePlugin } from '@conveycode/deck/plugins';
+import { initReveal } from '@fabiensalles/deck';
+import { mermaidPlugin } from '@fabiensalles/deck/plugins';
+import { autoResizePlugin } from '@fabiensalles/deck/plugins';
 
 const deck = initReveal({
   plugins: [mermaidPlugin, autoResizePlugin],

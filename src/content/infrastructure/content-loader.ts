@@ -1,7 +1,7 @@
 /**
  * Content Loader — Infrastructure
  * Deck content discovery using Node.js `fs` (build-time only).
- * Unified content discovery for @conveycode/deck.
+ * Unified content discovery for @fabiensalles/deck.
  */
 
 import fs from 'node:fs';

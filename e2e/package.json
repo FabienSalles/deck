@@ -1,5 +1,5 @@
 {
-  "name": "@conveycode/deck-e2e",
+  "name": "@fabiensalles/deck-e2e",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@conveycode/deck": "file:..",
+    "@fabiensalles/deck": "file:..",
     "astro": "^5.1.0",
     "sass": "^1.83.0",
     "mermaid": "^11.4.1"

@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import deck from '@conveycode/deck';
+import deck from '@fabiensalles/deck';
 
 export default defineConfig({
   integrations: [deck()],

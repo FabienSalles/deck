@@ -1,5 +1,5 @@
 /**
- * @conveycode/deck
+ * @fabiensalles/deck
  * Astro integration for Reveal.js presentations with exercises, corrections, and PDF export.
  */
 
