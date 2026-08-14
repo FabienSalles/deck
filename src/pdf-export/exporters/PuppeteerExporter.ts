@@ -34,8 +34,9 @@ const PRINT_STYLES = `
 `;
 
 /**
- * Exporter for slides, exercises and corrections, all rendered through a
- * shared Puppeteer browser pool.
+ * Exporter for document pages (exercises, corrections) using Puppeteer
+ *
+ * Uses a shared browser pool for efficient resource management.
  */
 export class PuppeteerExporter extends BaseExporter {
   readonly name = 'PuppeteerExporter';
@@ -47,7 +48,7 @@ export class PuppeteerExporter extends BaseExporter {
   }
 
   canExport(target: ExportTarget): boolean {
-    return target.type === 'exercice' || target.type === 'correction' || target.type === 'slides';
+    return target.type === 'exercice' || target.type === 'correction';
   }
 
   override async initialize(): Promise<void> {
@@ -76,21 +77,19 @@ export class PuppeteerExporter extends BaseExporter {
     // Ensure output directory exists
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
-    const typeName =
-      target.type === 'exercice' ? 'Exercise' : target.type === 'correction' ? 'Correction' : 'Slides';
-    const label = target.num ? `${typeName} ${target.num}` : typeName;
-    this.logger.info(`Exporting ${label}: ${target.deckPath}`);
+    const typeName = target.type === 'exercice' ? 'Exercise' : 'Correction';
+    this.logger.info(`Exporting ${typeName} ${target.num}: ${target.deckPath}`);
     this.logger.debug(`URL: ${url}`);
     this.logger.debug(`Output: ${outputPath}`);
 
     const { result, duration } = await this.withTiming(() =>
-      this.browserPool.withPage((page) => this.exportPage(page, target, url, outputPath))
+      this.browserPool.withPage((page) => this.exportPage(page, url, outputPath))
     );
 
     if (result.success) {
-      this.logger.info(`${label} exported (${(duration / 1000).toFixed(1)}s)`);
+      this.logger.info(`${typeName} ${target.num} exported (${(duration / 1000).toFixed(1)}s)`);
     } else {
-      this.logger.error(`${label} export failed: ${result.error}`);
+      this.logger.error(`${typeName} ${target.num} export failed: ${result.error}`);
     }
 
     return { ...result, duration };
@@ -99,12 +98,7 @@ export class PuppeteerExporter extends BaseExporter {
   /**
    * Export a single page to PDF
    */
-  private async exportPage(
-    page: Page,
-    target: ExportTarget,
-    url: string,
-    outputPath: string
-  ): Promise<ExportResult> {
+  private async exportPage(page: Page, url: string, outputPath: string): Promise<ExportResult> {
     try {
       await page.setViewport({ width: 794, height: 1123 }); // A4 at 96 DPI
       await page.emulateMediaType('print');
@@ -114,37 +108,29 @@ export class PuppeteerExporter extends BaseExporter {
         timeout: this.config.navigationTimeout,
       });
 
-      if (target.type === 'slides') {
-        // reveal.js paginates itself under the `?print-pdf` URL it was navigated to.
-        await page.waitForSelector('.reveal', { timeout: this.config.selectorTimeout });
-      } else {
-        await page.waitForSelector(SELECTORS.content, {
-          timeout: this.config.selectorTimeout,
-        });
+      await page.waitForSelector(SELECTORS.content, {
+        timeout: this.config.selectorTimeout,
+      });
 
-        await page.evaluate(
-          (styles: string, navSelector: string) => {
-            const styleEl = document.createElement('style');
-            styleEl.textContent = styles;
-            document.head.appendChild(styleEl);
+      await page.evaluate(
+        (styles: string, navSelector: string) => {
+          const styleEl = document.createElement('style');
+          styleEl.textContent = styles;
+          document.head.appendChild(styleEl);
 
-            document.querySelectorAll(navSelector).forEach((el) => {
-              (el as HTMLElement).style.display = 'none';
-            });
-          },
-          PRINT_STYLES,
-          SELECTORS.navigation
-        );
-      }
+          document.querySelectorAll(navSelector).forEach((el) => {
+            (el as HTMLElement).style.display = 'none';
+          });
+        },
+        PRINT_STYLES,
+        SELECTORS.navigation
+      );
 
       await page.pdf({
         path: outputPath,
         format: 'A4',
         printBackground: true,
-        margin:
-          target.type === 'slides'
-            ? undefined
-            : { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
+        margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
       });
 
       return {

@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { resolveExecutablePath } from './BrowserPool.js';
 import { BaseExporter, type ExportResult, type ExportTarget } from './ExporterInterface.js';
 
 /**
@@ -53,7 +54,18 @@ export class DecktapeExporter extends BaseExporter {
    */
   private runDecktape(url: string, outputPath: string): Promise<ExportResult> {
     return new Promise((resolve) => {
-      const args = ['decktape', 'reveal', url, outputPath, ...this.config.decktapeOptions];
+      // Decktape launches its own Puppeteer, unrelated to deck's puppeteer-core:
+      // PUPPETEER_EXECUTABLE_PATH has no effect on it, so the browser deck
+      // already resolved must be handed to it explicitly.
+      const args = [
+        'decktape',
+        '--chrome-path',
+        resolveExecutablePath(),
+        'reveal',
+        url,
+        outputPath,
+        ...this.config.decktapeOptions,
+      ];
 
       this.logger.debug(`Running: npx ${args.join(' ')}`);
 

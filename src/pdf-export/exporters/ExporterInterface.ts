@@ -90,7 +90,7 @@ export abstract class BaseExporter implements Exporter {
 
     switch (target.type) {
       case 'slides':
-        return `${baseUrl}/${target.deckPath}/?print-pdf`;
+        return `${baseUrl}/${target.deckPath}/`;
 
       case 'exercice':
         return `${baseUrl}/${target.deckPath}/exercices/${target.num}?print`;

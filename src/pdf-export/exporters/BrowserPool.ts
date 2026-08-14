@@ -6,7 +6,7 @@ import type { Logger } from '../utils/Logger.js';
  * puppeteer-core ships no browser of its own: the executable must be resolved
  * at launch time, from whatever Chromium build the host machine already has.
  */
-function resolveExecutablePath(): string {
+export function resolveExecutablePath(): string {
   const executablePath = process.env['PUPPETEER_EXECUTABLE_PATH'];
 
   if (!executablePath) {
