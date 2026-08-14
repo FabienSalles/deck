@@ -1,6 +1,23 @@
-import puppeteer, { type Browser, type Page } from 'puppeteer';
+import puppeteer, { type Browser, type Page } from 'puppeteer-core';
 
 import type { Logger } from '../utils/Logger.js';
+
+/**
+ * puppeteer-core ships no browser of its own: the executable must be resolved
+ * at launch time, from whatever Chromium build the host machine already has.
+ */
+function resolveExecutablePath(): string {
+  const executablePath = process.env['PUPPETEER_EXECUTABLE_PATH'];
+
+  if (!executablePath) {
+    throw new Error(
+      'PUPPETEER_EXECUTABLE_PATH is not set. deck-pdf needs a Chromium executable to launch; ' +
+        'point PUPPETEER_EXECUTABLE_PATH at one (e.g. a Playwright or Puppeteer browser cache).'
+    );
+  }
+
+  return executablePath;
+}
 
 /**
  * Browser pool for efficient Puppeteer resource management
@@ -27,6 +44,7 @@ export class BrowserPool {
 
     this.browser = await puppeteer.launch({
       headless: true,
+      executablePath: resolveExecutablePath(),
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     });
 

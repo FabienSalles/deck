@@ -4,7 +4,6 @@ import { resolveContentDir } from '../../integration/manifest.js';
 import { createConfig } from '../core/ExportConfig.js';
 import { ExportOrchestrator, type ExportSummary } from '../core/ExportOrchestrator.js';
 import { DeckScanner } from '../core/DeckScanner.js';
-import { DecktapeExporter } from '../exporters/DecktapeExporter.js';
 import { PuppeteerExporter } from '../exporters/PuppeteerExporter.js';
 import { createLogger } from '../utils/Logger.js';
 
@@ -142,7 +141,6 @@ async function runExport(
   const orchestrator = new ExportOrchestrator(config, scanner, logger);
 
   // Register exporters
-  orchestrator.registerExporter(new DecktapeExporter(config, logger));
   orchestrator.registerExporter(new PuppeteerExporter(config, logger));
 
   // Run appropriate export

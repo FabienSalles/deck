@@ -34,9 +34,6 @@ export interface ExportTarget {
 
 /**
  * Common interface for PDF exporters
- *
- * Implements the Strategy pattern - different export strategies
- * (Decktape for slides, Puppeteer for documents) share this interface.
  */
 export interface Exporter {
   /** Unique identifier for this exporter */
@@ -93,7 +90,7 @@ export abstract class BaseExporter implements Exporter {
 
     switch (target.type) {
       case 'slides':
-        return `${baseUrl}/${target.deckPath}/`;
+        return `${baseUrl}/${target.deckPath}/?print-pdf`;
 
       case 'exercice':
         return `${baseUrl}/${target.deckPath}/exercices/${target.num}?print`;
