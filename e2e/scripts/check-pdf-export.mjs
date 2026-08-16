@@ -94,7 +94,7 @@ console.log(`Using Chromium executable: ${executablePath}`);
 
 await run('npm', ['run', 'build']);
 
-const preview = spawn('npm', ['run', 'preview'], { stdio: 'inherit' });
+const preview = spawn('npm', ['run', 'preview'], { stdio: 'inherit', detached: true });
 
 try {
   await waitForServer(PREVIEW_URL);
@@ -116,5 +116,9 @@ try {
 
   console.log(`PDF export check passed: ${expectedPdfs.join(', ')}`);
 } finally {
-  preview.kill();
+  try {
+    process.kill(-preview.pid, 'SIGTERM');
+  } catch {
+    preview.kill();
+  }
 }
