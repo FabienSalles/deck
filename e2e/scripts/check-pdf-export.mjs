@@ -7,7 +7,7 @@ import { existsSync, readdirSync, statSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
 import path from 'node:path';
 
-const BROWSER_BUILD = 'chromium_headless_shell-1200';
+const BROWSER_BUILD_PREFIX = 'chromium_headless_shell-';
 const EXECUTABLE_NAME = platform() === 'win32' ? 'chrome-headless-shell.exe' : 'chrome-headless-shell';
 const CACHE_DIRS = [
   path.join(homedir(), 'Library', 'Caches', 'ms-playwright'),
@@ -32,14 +32,19 @@ function resolveExecutablePath() {
   if (process.env['PUPPETEER_EXECUTABLE_PATH']) return process.env['PUPPETEER_EXECUTABLE_PATH'];
 
   for (const cacheDir of CACHE_DIRS) {
-    const buildDir = path.join(cacheDir, BROWSER_BUILD);
-    if (existsSync(buildDir)) {
-      const executable = findExecutable(buildDir);
+    if (!existsSync(cacheDir)) continue;
+
+    const builds = readdirSync(cacheDir)
+      .filter((entry) => entry.startsWith(BROWSER_BUILD_PREFIX))
+      .sort((a, b) => Number(b.slice(BROWSER_BUILD_PREFIX.length)) - Number(a.slice(BROWSER_BUILD_PREFIX.length)));
+
+    for (const build of builds) {
+      const executable = findExecutable(path.join(cacheDir, build));
       if (executable) return executable;
     }
   }
   throw new Error(
-    `Could not find ${BROWSER_BUILD} under ${CACHE_DIRS.join(' or ')}. ` +
+    `Could not find a ${BROWSER_BUILD_PREFIX}* build under ${CACHE_DIRS.join(' or ')}. ` +
       'Install it with: npx playwright install chromium-headless-shell'
   );
 }
