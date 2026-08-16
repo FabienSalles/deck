@@ -19,7 +19,7 @@ npm run build
 npm pack --silent --pack-destination e2e
 cd e2e
 npm install ./fabiensalles-deck-*.tgz
-npx playwright install chromium --with-deps
+npx playwright install chromium chromium-headless-shell --with-deps
 npm run build
 npm test
 ```
