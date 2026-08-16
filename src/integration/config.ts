@@ -70,7 +70,7 @@ export const STYLE_SLOTS = ['presentation', 'document', 'home'] as const;
 export type StyleSlot = (typeof STYLE_SLOTS)[number];
 
 function packageEntry(slot: StyleSlot): string {
-  return `@conveycode/deck/styles/theme-${slot}.scss`;
+  return `@fabiensalles/deck/styles/theme-${slot}.scss`;
 }
 
 export type ResolvedDeckConfig = Omit<Required<DeckConfig>, 'styles'> & {

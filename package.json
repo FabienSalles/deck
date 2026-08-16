@@ -1,5 +1,5 @@
 {
-  "name": "@conveycode/deck",
+  "name": "@fabiensalles/deck",
   "version": "0.1.0",
   "description": "Astro integration for Reveal.js presentations with exercises, corrections, and PDF export",
   "type": "module",
@@ -32,8 +32,7 @@
   },
   "files": [
     "dist/",
-    "examples/",
-    "templates/"
+    "examples/"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-imports.js && node scripts/copy-assets.js",
@@ -41,7 +40,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/",
+    "lint": "eslint src/ scripts/ e2e/scripts/",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
@@ -52,23 +51,24 @@
     "commander": "^14.0.0",
     "js-yaml": "^4.1.0",
     "marked": "^17.0.0",
+    "puppeteer-core": "^24.0.0",
     "reveal.js": "^5.1.0",
     "vite-plugin-static-copy": "^3.1.4",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/js-yaml": "^4.0.0",
     "@types/node": "^22.0.0",
     "astro": "^5.1.0",
+    "eslint": "^10.8.1",
+    "eslint-plugin-no-unsanitized": "^4.1.5",
     "mermaid": "^11.13.0",
     "pngjs": "^7.0.0",
     "sass": "^1.83.0",
     "typescript": "^5.7.0",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^3.0.0"
-  },
-  "optionalDependencies": {
-    "decktape": "^3.14.0",
-    "puppeteer": "^24.0.0"
   },
   "keywords": [
     "astro",
@@ -81,6 +81,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/conveycode/deck"
-  }
+    "url": "https://github.com/FabienSalles/deck"
+  },
+  "homepage": "https://github.com/FabienSalles/deck#readme"
 }

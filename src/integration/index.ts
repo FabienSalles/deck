@@ -1,9 +1,9 @@
 /**
- * @conveycode/deck — Astro Integration
+ * @fabiensalles/deck — Astro Integration
  *
  * Usage in astro.config.mjs:
  * ```ts
- * import deck from '@conveycode/deck';
+ * import deck from '@fabiensalles/deck';
  *
  * export default defineConfig({
  *   integrations: [deck({ collection: 'decks' })],
@@ -23,7 +23,7 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
   const config = resolveConfig(userConfig);
 
   return {
-    name: '@conveycode/deck',
+    name: '@fabiensalles/deck',
 
     hooks: {
       'astro:config:setup': ({ injectRoute, updateConfig }) => {

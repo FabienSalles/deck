@@ -48,7 +48,7 @@ pack_and_install_deck() {
 }
 
 # Carries the formation repo's own local engine (predating the package) over
-# to consuming @conveycode/deck: its routes, content loading and theming
+# to consuming @fabiensalles/deck: its routes, content loading and theming
 # replace src/lib, src/pages, scripts/pdf-export and tests/behaviors.
 migrate_to_package() {
   rm -rf "$BENCH_DIR/src/lib" "$BENCH_DIR/src/pages" \
@@ -71,7 +71,7 @@ migrate_to_package() {
   # anything. Each entry pulls the package entry first, then formation's own.
   for slot in presentation:custom-theme document:document home:home; do
     cat > "$BENCH_DIR/src/styles/deck-${slot%%:*}.scss" <<EOF
-@use '@conveycode/deck/styles/theme-${slot%%:*}.scss';
+@use '@fabiensalles/deck/styles/theme-${slot%%:*}.scss';
 @use '${slot##*:}';
 EOF
   done
@@ -79,7 +79,7 @@ EOF
   cat > "$BENCH_DIR/astro.config.mjs" <<'EOF'
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
-import deck from '@conveycode/deck';
+import deck from '@fabiensalles/deck';
 
 export default defineConfig({
   srcDir: './src',

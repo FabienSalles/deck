@@ -1,5 +1,5 @@
 /**
- * @conveycode/deck — Reveal.js Module
+ * @fabiensalles/deck — Reveal.js Module
  * Public API for the Reveal.js integration.
  */
 

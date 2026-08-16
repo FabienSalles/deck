@@ -34,9 +34,6 @@ export interface ExportTarget {
 
 /**
  * Common interface for PDF exporters
- *
- * Implements the Strategy pattern - different export strategies
- * (Decktape for slides, Puppeteer for documents) share this interface.
  */
 export interface Exporter {
   /** Unique identifier for this exporter */

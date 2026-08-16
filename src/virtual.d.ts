@@ -4,7 +4,7 @@
  */
 
 declare module 'virtual:deck/config' {
-  import type { DeckConfig } from '@conveycode/deck';
+  import type { DeckConfig } from '@fabiensalles/deck';
 
   const config: Required<DeckConfig>;
   export default config;

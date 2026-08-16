@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Page } from 'puppeteer';
+import type { Page } from 'puppeteer-core';
 
 import type { ExportConfig } from '../core/ExportConfig.js';
 import type { Logger } from '../utils/Logger.js';
@@ -100,30 +100,24 @@ export class PuppeteerExporter extends BaseExporter {
    */
   private async exportPage(page: Page, url: string, outputPath: string): Promise<ExportResult> {
     try {
-      // Configure page for print
       await page.setViewport({ width: 794, height: 1123 }); // A4 at 96 DPI
       await page.emulateMediaType('print');
 
-      // Navigate to page
       await page.goto(url, {
         waitUntil: 'networkidle0',
         timeout: this.config.navigationTimeout,
       });
 
-      // Wait for content to load
       await page.waitForSelector(SELECTORS.content, {
         timeout: this.config.selectorTimeout,
       });
 
-      // Apply print styles and hide navigation
       await page.evaluate(
         (styles: string, navSelector: string) => {
-          // Inject print styles
           const styleEl = document.createElement('style');
           styleEl.textContent = styles;
           document.head.appendChild(styleEl);
 
-          // Hide navigation elements
           document.querySelectorAll(navSelector).forEach((el) => {
             (el as HTMLElement).style.display = 'none';
           });
@@ -132,17 +126,11 @@ export class PuppeteerExporter extends BaseExporter {
         SELECTORS.navigation
       );
 
-      // Generate PDF
       await page.pdf({
         path: outputPath,
         format: 'A4',
         printBackground: true,
-        margin: {
-          top: '1.5cm',
-          right: '1.5cm',
-          bottom: '1.5cm',
-          left: '1.5cm',
-        },
+        margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
       });
 
       return {

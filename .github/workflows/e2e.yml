@@ -25,13 +25,24 @@ jobs:
       - name: Build deck package
         run: npm run build
 
+      - name: Pack deck package
+        run: npm pack --silent --pack-destination e2e
+
       - name: Install e2e dependencies
         working-directory: e2e
-        run: npm install
+        run: npm install ./fabiensalles-deck-*.tgz
+
+      - name: Verify the install downloaded no browser
+        working-directory: e2e
+        run: test ! -e node_modules/puppeteer
 
       - name: Install Playwright browsers
         working-directory: e2e
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium chromium-headless-shell --with-deps
+
+      - name: Verify deck-pdf resolves a browser at launch
+        working-directory: e2e
+        run: node scripts/check-pdf-export.mjs
 
       - name: Build e2e project
         working-directory: e2e
