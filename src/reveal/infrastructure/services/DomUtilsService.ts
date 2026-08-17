@@ -55,6 +55,19 @@ export function waitForImages(container: HTMLElement): Promise<void> {
 }
 
 /**
+ * Wait for web fonts to finish loading.
+ *
+ * Text measured against fallback metrics and text measured against the real face do not
+ * have the same height, so a slide measured before the fonts land is measured against a
+ * layout the reader never sees.
+ */
+export function waitForFonts(): Promise<void> {
+  const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+
+  return fonts === undefined ? Promise.resolve() : fonts.ready.then(() => {});
+}
+
+/**
  * Request animation frame promise wrapper.
  */
 export function nextFrame(): Promise<void> {

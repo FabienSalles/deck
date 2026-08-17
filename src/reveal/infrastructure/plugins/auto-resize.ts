@@ -8,8 +8,7 @@
 import type { Api, Plugin } from 'reveal.js';
 import { DEFAULT_RESIZE_OPTIONS, RESIZE_CLASSES } from '../../domain/constants';
 import { getPrintModeService, isHeadlessBrowser } from '../services/PrintModeService';
-import { waitForImages, nextFrame, waitForLayout } from '../services/DomUtilsService';
-import { createOverflowDetector } from '../services/OverflowDetector';
+import { waitForImages, waitForFonts, nextFrame, waitForLayout } from '../services/DomUtilsService';
 import { createResizeStrategies, type ResizeStrategy } from '../services/ResizeStrategies';
 
 type ResizeOptions = {
@@ -22,10 +21,9 @@ type ResizeOptions = {
 class SlideResizer {
   private readonly options: Required<ResizeOptions>;
   private resizeObserver: ResizeObserver | null = null;
-  private readonly processedSlides = new WeakSet<HTMLElement>();
+  private readonly pendingBySlide = new WeakMap<HTMLElement, Promise<void>>();
   private readonly isPrintMode: boolean;
   private readonly isExportMode: boolean;
-  private readonly overflowDetector;
   private readonly resizeStrategies: ResizeStrategy[];
 
   constructor(options: ResizeOptions = {}) {
@@ -34,7 +32,6 @@ class SlideResizer {
     this.isPrintMode = printModeService.isPrintMode();
     this.isExportMode = printModeService.isExportMode();
 
-    this.overflowDetector = createOverflowDetector(this.isExportMode);
     this.resizeStrategies = createResizeStrategies(
       this.isExportMode,
       this.options.minFontSize,
@@ -56,24 +53,33 @@ class SlideResizer {
     );
   }
 
-  async adjustSlideSize(slide: HTMLElement): Promise<void> {
+  // Every trigger — the observer, the image wait, a slide change — queues behind the
+  // adjustment already running on that slide. Two passes interleaving on one slide is how
+  // a half-applied measurement reaches the next strategy.
+  adjustSlideSize(slide: HTMLElement): Promise<void> {
+    const queued = (this.pendingBySlide.get(slide) ?? Promise.resolve()).then(() =>
+      this.runStrategies(slide),
+    );
+
+    this.pendingBySlide.set(slide, queued);
+
+    return queued;
+  }
+
+  private async runStrategies(slide: HTMLElement): Promise<void> {
     if (this.shouldSkipSlide(slide)) {
       return;
     }
 
-    const overflowInfo = this.overflowDetector.getOverflowInfo(slide);
-
     for (const strategy of this.resizeStrategies) {
       if (strategy.canApply(slide)) {
-        const result = await strategy.apply(slide, overflowInfo);
+        const result = await strategy.apply(slide);
 
         if (result.resized) {
           await waitForLayout();
         }
       }
     }
-
-    this.processedSlides.add(slide);
   }
 
   observeSlides(slides: HTMLElement[]): void {
@@ -112,12 +118,11 @@ class SlideResizer {
 
 async function preResizeAllSlides(slides: HTMLElement[], resizer: SlideResizer): Promise<void> {
   await Promise.all(slides.map((slide) => waitForImages(slide)));
-
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await waitForFonts();
+  await waitForLayout();
 
   for (const slide of slides) {
     await resizer.adjustSlideSize(slide);
-    await new Promise((resolve) => setTimeout(resolve, 20));
   }
 
   for (const slide of slides) {
