@@ -3,12 +3,13 @@
  * DOM-dependent resize strategies using pure config from domain/resize.service.ts.
  */
 
-import type { OverflowInfo, ResizeResult } from '../../domain/reveal.model';
+import type { ResizeResult } from '../../domain/reveal.model';
 import {
   RESIZE_CLASSES,
   CODE_RESIZE_CONFIG,
   TEXT_RESIZE_CONFIG,
 } from '../../domain/constants';
+import { computeOverflow } from '../../domain/overflow.service';
 import {
   getCodeBlockConfig,
   getImageResizeThresholds,
@@ -18,9 +19,12 @@ import {
   type CodeBlockConfig,
 } from '../../domain/resize.service';
 
+// A strategy measures the slide itself, at the moment it acts. Handing it a measurement
+// taken earlier lets a pass decide on dimensions its own first statement has already
+// invalidated, which is how a second pass came to undo the first.
 export interface ResizeStrategy {
   canApply(slide: HTMLElement): boolean;
-  apply(slide: HTMLElement, overflowInfo: OverflowInfo): Promise<ResizeResult>;
+  apply(slide: HTMLElement): Promise<ResizeResult>;
 }
 
 // -- Image Resize Strategy --
@@ -74,13 +78,14 @@ export class CodeBlockResizeStrategy implements ResizeStrategy {
     return slide.querySelectorAll('pre').length > 0;
   }
 
-  async apply(slide: HTMLElement, overflowInfo: OverflowInfo): Promise<ResizeResult> {
+  async apply(slide: HTMLElement): Promise<ResizeResult> {
     const codeBlocks = slide.querySelectorAll('pre');
 
     if (codeBlocks.length === 0) {
       return { resized: false, strategy: 'code' };
     }
 
+    const overflowInfo = computeOverflow(slide.scrollHeight, slide.offsetHeight);
     const slideHeight = slide.offsetHeight;
     const totalCodeHeight = this.calculateTotalCodeHeight(codeBlocks);
     const config = getCodeBlockConfig(overflowInfo.overflowPercent, this.isPrintMode);
@@ -133,12 +138,23 @@ export class CodeBlockResizeStrategy implements ResizeStrategy {
       pre.dataset['originalPadding'] = computedStyle.padding;
     }
 
-    const currentFontSize = parseFloat(pre.dataset['originalFontSize'] ?? '16');
-    const newFontSize = currentFontSize * config.fontReduction;
-    code.style.fontSize = `${newFontSize}px`;
+    // A later pass measures a slide the earlier one already shrank, so it computes a
+    // gentler reduction. Keeping the strongest one ever applied is what stops the font
+    // growing back and the two passes trading the slide between two sizes.
+    const previousReduction = parseFloat(pre.dataset['appliedReduction'] ?? '1');
+    const reduction = Math.min(config.fontReduction, previousReduction);
+
+    if (reduction >= previousReduction) {
+      return false;
+    }
+
+    pre.dataset['appliedReduction'] = `${reduction}`;
+
+    const originalFontSize = parseFloat(pre.dataset['originalFontSize'] ?? '16');
+    code.style.fontSize = `${originalFontSize * reduction}px`;
     code.style.padding = config.padding;
 
-    if (config.fontReduction <= CODE_RESIZE_CONFIG.MIN_FONT_REDUCTION) {
+    if (reduction <= CODE_RESIZE_CONFIG.MIN_FONT_REDUCTION) {
       code.style.lineHeight = '1.2';
     }
 
@@ -184,8 +200,10 @@ export class TextFontSizeStrategy implements ResizeStrategy {
     return true;
   }
 
-  async apply(slide: HTMLElement, overflowInfo: OverflowInfo): Promise<ResizeResult> {
+  async apply(slide: HTMLElement): Promise<ResizeResult> {
     slide.style.fontSize = '';
+
+    const overflowInfo = computeOverflow(slide.scrollHeight, slide.offsetHeight);
 
     if (!overflowInfo.hasOverflow) {
       slide.classList.remove(RESIZE_CLASSES.OVERFLOW_WARNING);
