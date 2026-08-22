@@ -8,7 +8,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@fabiensalles/deck": "file:fabiensalles-deck-0.1.0.tgz",
+    "@fabiensalles/deck": "file:fabiensalles-deck-0.1.1.tgz",
     "astro": "^5.1.0",
     "mermaid": "^11.4.1",
     "sass": "^1.83.0"

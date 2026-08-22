@@ -18,3 +18,4 @@ e2e/public/pdf/
 # Claude Code workspace
 .claude/plans/
 .claude/goal-runs/
+e2e/*.tgz
