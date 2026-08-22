@@ -79,6 +79,9 @@
     "pdf-export"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/FabienSalles/deck"

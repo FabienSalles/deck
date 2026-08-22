@@ -10,16 +10,28 @@ npm install @fabiensalles/deck
 
 ## Quick start
 
-The commands below are the ones the `e2e` workflow runs: they build the package, pack it into
-a tarball, install that tarball as a fresh consumer would, then build and test against it.
+`@fabiensalles/deck` is an Astro integration. Your project needs `astro` (^5.0.0) and
+`mermaid` (^11.0.0) installed as peer dependencies:
 
 ```bash
-npm ci
-npm run build
-npm pack --silent --pack-destination e2e
-cd e2e
-npm install ./fabiensalles-deck-*.tgz
-npx playwright install chromium chromium-headless-shell --with-deps
-npm run build
-npm test
+npm install @fabiensalles/deck astro mermaid
+```
+
+Register it in `astro.config.mjs`:
+
+```js
+import { defineConfig } from 'astro/config';
+import deck from '@fabiensalles/deck';
+
+export default defineConfig({
+  integrations: [deck()],
+});
+```
+
+PDF export (the `deck-pdf` binary) launches Chromium through `puppeteer-core`, which does not
+ship a browser of its own. Point `PUPPETEER_EXECUTABLE_PATH` at one (a Playwright or
+Puppeteer browser cache works) before running it:
+
+```bash
+PUPPETEER_EXECUTABLE_PATH=/path/to/chromium deck-pdf
 ```

@@ -71,6 +71,7 @@ export class DecktapeExporter extends BaseExporter {
 
       const childProcess = spawn('npx', args, {
         stdio: ['ignore', 'pipe', 'pipe'],
+        env: { ...process.env, PUPPETEER_SKIP_DOWNLOAD: '1' },
       });
 
       let stderr = '';
