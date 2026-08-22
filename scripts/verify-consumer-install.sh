@@ -6,6 +6,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+node scripts/check-readme-quickstart.mjs
+
 npm ci
 npm run build
 npm pack --silent --pack-destination e2e
