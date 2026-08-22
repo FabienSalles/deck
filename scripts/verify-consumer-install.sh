@@ -10,10 +10,10 @@ node scripts/check-readme-quickstart.mjs
 
 npm ci
 npm run build
-npm pack --silent --pack-destination e2e
+tarball=$(npm pack --silent --pack-destination e2e)
 
 cd e2e
-npm install ./fabiensalles-deck-*.tgz
+npm install "./$tarball"
 
 test ! -e node_modules/puppeteer
 
