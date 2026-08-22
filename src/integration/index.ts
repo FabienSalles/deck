@@ -97,6 +97,7 @@ export default function deckIntegration(userConfig: DeckConfig = {}): AstroInteg
                     },
                   },
                 ],
+                silent: true,
               }),
             ],
           },

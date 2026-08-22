@@ -25,3 +25,12 @@ describe('Repository - LICENSE', () => {
     expect(licenseText).toContain('MIT License');
   });
 });
+
+describe('Package manifest - peer dependencies', () => {
+  it('should declare the sass compiler its own themes need', () => {
+    // GIVEN a package whose default themes are .scss files compiled by the host
+    // WHEN a consumer installs it
+    // THEN the manifest asks the host for a sass implementation
+    expect(pkg.peerDependencies?.sass).toBeDefined();
+  });
+});

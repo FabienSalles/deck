@@ -45,7 +45,8 @@
   },
   "peerDependencies": {
     "astro": "^5.0.0",
-    "mermaid": "^11.0.0"
+    "mermaid": "^11.0.0",
+    "sass": "^1.83.0"
   },
   "dependencies": {
     "commander": "^14.0.0",
