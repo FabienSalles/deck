@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Use an npm that speaks OIDC
+        run: npm install -g npm@latest
+
+      - name: Refuse a tag that diverges from the manifest
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: bash scripts/check-release-version.sh "$TAG_NAME"
+
+      - name: Install Playwright browsers
+        run: npx --yes playwright@1.57.0 install chromium chromium-headless-shell --with-deps
+
+      - name: Verify the tagged commit
+        run: bash scripts/verify-consumer-install.sh
+
+      - name: Publish
+        run: npm publish
