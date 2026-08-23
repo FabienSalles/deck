@@ -1,6 +1,6 @@
 {
   "name": "@fabiensalles/deck",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Astro integration for Reveal.js presentations with exercises, corrections, and PDF export",
   "type": "module",
   "exports": {
